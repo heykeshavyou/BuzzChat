@@ -1,0 +1,88 @@
+﻿@if (selectedUser != null)
+{
+	<div class="d-flex flex-column justify-content-between h-100">
+
+		<!-- Header -->
+		<div class="p-3 border-bottom" style="background-color:#2d2d3f;">
+			<h5 class="mb-0 text-white">	<strong>@selectedUser.Name</strong></h5>
+		</div>
+
+		<!-- Chat Messages Area -->
+		<div class="flex-grow-1 d-flex flex-column overflow-auto p-3 hide-scrollbar" id="chatBox" style="background-color:#1e1e2f;">
+			@if (AllMessage?.Count > 0)
+			{
+				foreach (var message in AllMessage)
+				{
+					<div class="mb-2">
+						@if (message.FromId != AuthenticationState.Id)
+						{
+							<div class="d-flex justify-content-start">
+								<div class="bg-secondary text-white rounded-3 " style="max-width: 70%;">
+									<p class="m-0 px-2 py-1">
+										@message.Content
+									</p>
+									<p class="text-dark m-0 text-end px-2" style="font-size:9px">@message.SentOn.ToString("t")
+										
+										
+									</p>
+								</div>
+							</div>
+						}
+						else
+						{
+							<div class="d-flex justify-content-end">
+								<div class="bg-primary text-white  rounded-3 " style="max-width: 70%;">
+									<p class="m-0 px-2 py-1 text-wrap">
+										@message.Content
+									</p>
+									<p class="text-dark m-0 text-end px-2" style="font-size:9px">@message.SentOn.ToString("t")
+										<svg xmlns="http://www.w3.org/2000/svg" width="15"  fill="@(message.IsRead?"white":"fillcolor")" class="bi bi-check2-all ms-2" viewBox="0 0 16 16">
+											<path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0" />
+											<path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708" />
+										</svg>
+									</p>
+
+								</div>
+							</div>
+						}
+					</div>
+				}
+			}
+		</div>
+		<div class="p-3 border-top bg-light" style="position: sticky; bottom: 0; z-index: 100;">
+				<div class="input-group">
+					<InputText @bind-Value="_newmessage"
+							   class="form-control border-primary rounded-start"
+							   placeholder="Type your message..." />
+					<button @onclick="HandleSendMessage"
+							class="btn btn-primary rounded-end">
+						Send
+					</button>
+				</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="text-center mt-5">
+		<h4 class="text-muted">🗨️ Start chatting by selecting a user</h4>
+	</div>
+}
+
+@code {
+	[Parameter] public EventCallback<string> SendMessage { get; set; }
+	[CascadingParameter(Name = "State")] public AuthenticationState AuthenticationState { get; set; }
+	[Parameter] public UserModelHub? selectedUser { get; set; }
+	[Parameter] public List<MessageModel> AllMessage { get; set; }
+	public string _newmessage = "";
+
+	private async Task HandleSendMessage()
+	{
+		if (!string.IsNullOrWhiteSpace(_newmessage))
+		{
+			await SendMessage.InvokeAsync(_newmessage);
+			_newmessage ="";
+		}
+	}
+
+}

@@ -1,0 +1,6 @@
+@BuzzTalk.Server_HostAddress = http://localhost:5157
+
+GET {{BuzzTalk.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

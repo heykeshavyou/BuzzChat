@@ -1,0 +1,107 @@
+﻿<h2 class="mb-4">People</h2>
+
+@if (Users != null && Users.Any())
+{
+    <ul class="list-group bg-none ">
+        @foreach (var user in Users)
+        {
+            if (user == null)
+            {
+                continue;
+            }
+
+            var isActive = ActiveUsers?.Any(x => x?.Id == user.Id) ?? false;
+            string lastMessage = string.Empty;
+            string time = "";
+            bool readed = false;
+            var messageList = new List<MessageModel>();
+            if (AllMessages != null && user.Id != null && AllMessages.TryGetValue(user.Id, out var userMessages))
+            {
+                messageList = userMessages.Where(x => x.IsRead == false && x.FromId != AuthenticationState.Id).ToList();
+                if (messageList.Count <= 1 )
+                {
+                    var temp = userMessages.LastOrDefault();
+                    if (temp != null)
+                    {
+                        lastMessage = temp.Content;
+                        if (temp.FromId != AuthenticationState.Id)
+                        {
+                            readed = temp.IsRead;
+                        }
+                        else
+                        {
+                            readed = true;
+
+                        }
+                    }
+                    
+                }
+                else
+                {
+					lastMessage = $"{messageList.Count} New Messages";
+                }
+                time = userMessages.LastOrDefault()?.SentOn.ToString("HH:mm");
+
+            }
+
+            <li class="list-group-item bg-none text-white  list-group-item-action  px-3 py-3"
+                style="cursor:pointer;background:none !important"
+                @onclick="() => HandleClickUser(user)">
+                <div class="d-flex justify-content-between align-items-center">
+					<div class="me-auto">
+						<div class="fw-semibold">@user.Name</div>
+					</div>
+					<div class=" @((isActive ? "bg-success" : "bg-none")) rounded-circle" style="width:14px;height:14px;">
+					</div>
+                </div>
+
+                <div class="x @((readed ?"text-secondary " :"text-white "  )) small text-truncate d-flex justify-content-between w-100">
+                    <span>
+                        @lastMessage
+                    </span>
+                    <span>
+                        @time
+                    </span>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="text-center mt-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+
+@code {
+	[CascadingParameter(Name = "State")]
+	public AuthenticationState AuthenticationState { get; set; }
+    [Parameter]
+    public IEnumerable<UserModelHub>? ActiveUsers { get; set; } = Enumerable.Empty<UserModelHub>();
+
+    [Parameter]
+    public IEnumerable<UserModelHub>? Users { get; set; } = Enumerable.Empty<UserModelHub>();
+
+    [Parameter]
+    public EventCallback<UserModelHub> OnUserSelected { get; set; }
+
+    [Parameter]
+    public Dictionary<int, List<MessageModel>>? AllMessages { get; set; } = new();
+
+    private async Task HandleClickUser(UserModelHub user)
+    {
+        if (user != null)
+        {
+            await OnUserSelected.InvokeAsync(user);
+        }
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+}

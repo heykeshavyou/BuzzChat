@@ -1,0 +1,107 @@
+﻿@page "/signin"
+@inject HttpClient httpClient
+@inject NavigationManager Navigation
+<PageTitle>BuzzTalk - SignIn</PageTitle>
+
+<!-- Fullscreen Dark Background -->
+<div class="d-flex justify-content-center align-items-center vh-100" style="background: #121212;">
+	<div class="p-5 rounded-4 shadow" style="background-color: #1e1e1e; min-width: 400px; max-width: 90%; color: white;">
+
+		<h2 class="text-center mb-4 fw-bold text-primary">Sign Up for BuzzTalk</h2>
+
+		<EditForm Model="signInModel" OnValidSubmit="SignIN">
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+
+			@if (error)
+			{
+				<p class="text-danger">@errormessage</p>
+			}
+
+			<div class="mb-3">
+				<label for="name" class="form-label text-light">Name</label>
+				<InputText id="name" class="form-control p-2 bg-dark text-light border-primary" @bind-Value="signInModel.Name" />
+				<ValidationMessage For="() => signInModel.Name" />
+			</div>
+
+			<div class="mb-3">
+				<label for="username" class="form-label text-light">Username</label>
+				<InputText id="username" class="form-control p-2 bg-dark text-light border-primary" @bind-Value="signInModel.Username" />
+				<ValidationMessage For="() => signInModel.Username" />
+			</div>
+
+			<div class="mb-3">
+				<label for="email" class="form-label text-light">Email</label>
+				<InputText id="email" class="form-control p-2 bg-dark text-light border-primary" @bind-Value="signInModel.Email" />
+				<ValidationMessage For="() => signInModel.Email" />
+			</div>
+
+			<div class="mb-3">
+				<label for="password" class="form-label text-light">Password</label>
+				<InputText id="password" type="password" class="form-control p-2 bg-dark text-light border-primary" @bind-Value="signInModel.Password" />
+				<ValidationMessage For="() => signInModel.Password" />
+			</div>
+
+			<button class="btn btn-primary w-100 py-2 mt-3 fw-semibold" disabled="@IsProcessing">
+				@if (IsProcessing)
+				{
+					<div class="spinner-border spinner-border-sm text-light" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				}
+				else
+				{
+					<span>Sign In</span>
+				}
+			</button>
+		</EditForm>
+
+		<div class="text-center mt-4">
+			<NavLink href="/" class="text-decoration-none text-secondary">
+				Already have an account? <span class="text-primary fw-semibold">Login</span>
+			</NavLink>
+		</div>
+	</div>
+</div>
+
+@code {
+	[CascadingParameter(Name = "State")]
+	public AuthenticationState AuthenticationState { get; set; }
+
+	public SignModel signInModel { get; set; } = new();
+	private bool IsProcessing = false;
+	private bool error = false;
+	private string errormessage = "";
+
+	private async Task SignIN()
+	{
+		try
+		{
+			IsProcessing = true;
+			error = false;
+
+			string data = JsonConvert.SerializeObject(signInModel);
+			var content = new StringContent(data, Encoding.UTF8, "application/json");
+
+			var res = await httpClient.PostAsync("https://localhost:7059/api/Account/SignIn", content);
+			if (res.IsSuccessStatusCode)
+			{
+				Navigation.NavigateTo("/");
+			}
+			else
+			{
+				error = true;
+				errormessage = await res.Content.ReadAsStringAsync();
+			}
+		}
+		catch (Exception ex)
+		{
+			error = true;
+			errormessage = "An error occurred. Please try again.";
+		}
+		finally
+		{
+			IsProcessing = false;
+		}
+	}
+}

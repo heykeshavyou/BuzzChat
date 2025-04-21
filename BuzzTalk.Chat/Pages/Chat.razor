@@ -1,0 +1,272 @@
+﻿@page "/chat"
+@implements IAsyncDisposable
+@inject NavigationManager NavigationMan
+@inject IJSRuntime JSRuntime
+@using System.Net.Http.Headers
+@inject HttpClient _httpClient
+
+<PageTitle>BuzzTalk - Chat</PageTitle>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+	body {
+	font-family: 'Inter', sans-serif;
+	background-color: #1e1e2f;
+	color: #f1f1f1;
+	}
+
+	.header {
+	background-color: #2a2a40;
+	padding: 1rem 2rem;
+	border-radius: 1rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+	}
+
+	.chat-container {
+	background-color: #2a2a40;
+	border-radius: 1rem;
+	overflow: hidden;
+	height: 80vh;
+	box-shadow: 0 0 20px rgba(0,0,0,0.2);
+	}
+
+	.user-list {
+	background-color: #232336;
+	padding: 1rem;
+	border-right: 1px solid #444;
+	height: 100%;
+	overflow-y: auto;
+	}
+
+	.message-box {
+	padding: 1rem;
+	background-color: #1e1e2f;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	}
+</style>
+
+<div class="container-fluid my-4">
+	<div class="header">
+		<h3 class="mb-0">💬 BuzzTalk - Chat</h3>
+		<div>
+			<span class="me-3">👋 Hello, <strong>@AuthenticationState.Name</strong></span>
+			<button class="btn btn-danger btn-sm" @onclick="Logout">Logout</button>
+		</div>
+	</div>
+
+	<div class="row chat-container">
+		<div class="col-3 user-list">
+			<UserList Users="Users" ActiveUsers="ChatUsers" AllMessages="AllMessages" OnUserSelected="OnUserSelected" />
+		</div>
+
+		<div class="col-9 message-box">
+			<MessageBox SendMessage="SendMessage" AllMessage="AllMessage" selectedUser="_selectedUser" />
+		</div>
+	</div>
+</div>
+
+@code {
+	[CascadingParameter(Name = "State")]
+	public AuthenticationState AuthenticationState { get; set; }
+
+	public List<UserModelHub> Users { get; set; } = new();
+	public List<UserModelHub> ChatUsers { get; set; } = new();
+	private HubConnection _hubConnection;
+	private UserModelHub? _selectedUser = null;
+	public List<MessageModel> AllMessage { get; set; }
+	public Dictionary<int, List<MessageModel>> AllMessages { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			_hubConnection = HubConnecter();
+			await _hubConnection.StartAsync();
+
+			var currentUser = new UserModelHub
+				{
+					Name = AuthenticationState.Name,
+					Username = AuthenticationState.Username,
+					Id = AuthenticationState.Id
+				};
+
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticationState.Token);
+
+			var response = await _httpClient.GetAsync("https://localhost:7059/api/Account/GetAllUsers");
+			if (response.IsSuccessStatusCode)
+			{
+				var result = await response.Content.ReadAsStringAsync();
+				Users = JsonConvert.DeserializeObject<List<UserModelHub>>(result);
+				foreach (var user in Users)
+				{
+					var getmessageModel = new GetmessageModel
+						{
+							ToId = user.Id,
+							FromId = AuthenticationState.Id
+						};
+
+					var data = JsonConvert.SerializeObject(getmessageModel);
+					var content = new StringContent(data, Encoding.UTF8, "application/json");
+
+					var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/GetAllMessages", content);
+					var mesresult = await res.Content.ReadAsStringAsync();
+					var messagelist = JsonConvert.DeserializeObject<List<MessageModel>>(mesresult);
+					AllMessages[user.Id] = messagelist;
+				}
+			}
+
+			await _hubConnection.SendAsync("ConnectUser", currentUser);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
+	}
+
+	private HubConnection HubConnecter()
+	{
+		var hubConnection = new HubConnectionBuilder()
+			.WithUrl("https://localhost:7059/Buzz/TalkHub", opt =>
+			{
+				opt.AccessTokenProvider = () => Task.FromResult(AuthenticationState.Token);
+			})
+			.Build();
+
+		hubConnection.On<UserModelHub>("UserConnected", user =>
+		{
+			if (!ChatUsers.Any(x => x.Id == user.Id))
+			{
+				ChatUsers.Add(user);
+				StateHasChanged();
+			}
+		});
+
+		hubConnection.On<ICollection<UserModelHub>>("ConnectedUsers", users =>
+		{
+			ChatUsers.AddRange(users.Where(u => !ChatUsers.Any(c => c.Id == u.Id)));
+			StateHasChanged();
+		});
+
+		hubConnection.On<UserModelHub>("NewUserSignIn", user =>
+		{
+			Users.Add(user);
+			StateHasChanged();
+		});
+
+		hubConnection.On<UserModelHub>("UserDisconnected", user =>
+		{
+			ChatUsers.RemoveAll(c => c.Id == user.Id);
+			StateHasChanged();
+		});
+
+		hubConnection.On<MessageModel>("NewMesseageRecived", message =>
+		{
+			if (AllMessages.ContainsKey(message.FromId))
+			{
+				if (_selectedUser.Id == message.FromId)
+				{
+					var getmessageModel = new GetmessageModel
+					{
+						ToId = _selectedUser.Id,
+						FromId = AuthenticationState.Id
+					};
+
+					var data = JsonConvert.SerializeObject(getmessageModel);
+					var content = new StringContent(data, Encoding.UTF8, "application/json");
+					var res = _httpClient.PostAsync("https://localhost:7059/api/Message/MarkRead", content).Result;
+					var mesresult = res.Content.ReadAsStringAsync().Result;
+					var messagelist = JsonConvert.DeserializeObject<List<MessageModel>>(mesresult);
+					message = messagelist[0];
+				}
+				AllMessages[message.FromId].Add(message);
+			}
+
+			StateHasChanged();
+		});
+
+		return hubConnection;
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_hubConnection is not null)
+		{
+			await _hubConnection.DisposeAsync();
+		}
+	}
+
+	public async Task Logout()
+	{
+		await JSRuntime.InvokeVoidAsync("localStorage.clear");
+		AuthenticationState.OnPropertyChanged();
+		NavigationMan.NavigateTo("/");
+	}
+
+	private async Task OnUserSelected(UserModelHub user)
+	{
+		_selectedUser = user;
+		AllMessage = AllMessages.TryGetValue(user.Id, out var messages) ? messages : new List<MessageModel>();
+		if(AllMessage.Where(x=>x.IsRead).ToList().Count()>0){
+			var getmessageModel = new GetmessageModel
+				{
+					ToId = user.Id,
+					FromId = AuthenticationState.Id
+				};
+
+			var data = JsonConvert.SerializeObject(getmessageModel);
+			var content = new StringContent(data, Encoding.UTF8, "application/json");
+			var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/MarkRead", content);
+			var mesresult = await res.Content.ReadAsStringAsync();
+			var messagelist = JsonConvert.DeserializeObject<List<MessageModel>>(mesresult);
+			if (AllMessages.TryGetValue(user.Id, out var messagesInDict))
+			{
+				foreach (var updatedMsg in messagelist)
+				{
+					var existingMsg = messagesInDict.FirstOrDefault(m => m.Id == updatedMsg.Id);
+					if (existingMsg != null)
+					{
+						existingMsg.IsRead = updatedMsg.IsRead;
+					}
+				}
+			}
+		}
+		StateHasChanged();
+	}
+
+	public async Task SendMessage(string message)
+	{
+		var messageModel = new MessageModel
+			{
+				Content = message,
+				ToId = _selectedUser.Id,
+				FromId = AuthenticationState.Id
+			};
+
+		try
+		{
+			var data = JsonConvert.SerializeObject(messageModel);
+			var content = new StringContent(data, Encoding.UTF8, "application/json");
+
+			var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/SendMessage", content);
+			if (res.IsSuccessStatusCode)
+			{
+				string result = await res.Content.ReadAsStringAsync();
+				var message1 = JsonConvert.DeserializeObject<MessageModel>(result);
+
+					AllMessages[message1.ToId].Add(message1);
+
+				StateHasChanged();
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
+	}
+}

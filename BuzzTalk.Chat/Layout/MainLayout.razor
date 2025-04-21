@@ -1,0 +1,58 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<CascadingValue Value="AuthenticationState" Name="State">
+    <div class="container-fluid">
+        @Body
+    </div>
+</CascadingValue>
+
+@code {
+    public AuthenticationState AuthenticationState { get; set; } = new();
+    private bool _isInitialized;
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender && !_isInitialized)
+    //     {
+    //         _isInitialized = true;
+    //     }
+    // }
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeAuthState();
+    }
+
+    private async Task InitializeAuthState()
+    {
+        try
+        {
+            // Only runs on client-side after render
+            var user = await JSRuntime.InvokeAsync<string>(
+                "localStorage.getItem",
+                AuthenticationState.BuzzKey
+            );
+
+            if (!string.IsNullOrWhiteSpace(user))
+            {
+                var userModel = JsonConvert.DeserializeObject<UserModel>(user);
+                AuthenticationState.OnPropertyChanged(userModel);
+
+                if (AuthenticationState.IsAuthenticated)
+                {
+                    NavigationManager.NavigateTo("/chat");
+                }
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Auth init failed: {ex.Message}");
+        }
+    }
+}
