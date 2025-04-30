@@ -84,10 +84,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        policy => policy.WithOrigins("https://localhost:7024")
+        policy => policy.AllowAnyOrigin()
                         .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials());
+                        .AllowAnyMethod());
 });
 // And later
 builder.Services.AddSignalR();

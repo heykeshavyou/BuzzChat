@@ -24,14 +24,12 @@ namespace BuzzTalk.Server.Hubs
         {
 
         }
-        [Authorize]
         public override Task OnConnectedAsync()
         {
-            var user = this.Context.User;
-            var userName = user.FindFirst(ClaimTypes.Name);
+            //var user = this.Context.User;
+            //var userName = user.FindFirst(ClaimTypes.Name);
             return base.OnConnectedAsync();
         }
-        [Authorize]
         public async Task ConnectUser(UserModelHub user)
         {
             await Clients.Caller.ConnectedUsers(_connectedUsers.Values.Where(x => x.Id != user.Id).ToList());
@@ -43,7 +41,6 @@ namespace BuzzTalk.Server.Hubs
             }
            await Clients.Others.UserConnected(user);
         }
-        [Authorize]
         public override Task OnDisconnectedAsync(Exception? exception)
         {
             var user = this.Context.User;
@@ -61,5 +58,6 @@ namespace BuzzTalk.Server.Hubs
 
             return base.OnDisconnectedAsync(exception);
         }
+
     }
 }

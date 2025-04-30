@@ -165,7 +165,7 @@
 			StateHasChanged();
 		});
 
-		hubConnection.On<MessageModel>("NewMesseageRecived", message =>
+		hubConnection.On<MessageModel>("NewMesseageRecived", new Action<MessageModel>(async(message) => 
 		{
 			if (AllMessages.ContainsKey(message.FromId))
 			{
@@ -179,8 +179,8 @@
 
 					var data = JsonConvert.SerializeObject(getmessageModel);
 					var content = new StringContent(data, Encoding.UTF8, "application/json");
-					var res = _httpClient.PostAsync("https://localhost:7059/api/Message/MarkRead", content).Result;
-					var mesresult = res.Content.ReadAsStringAsync().Result;
+					var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/MarkRead", content);
+					var mesresult = await res.Content.ReadAsStringAsync();
 					var messagelist = JsonConvert.DeserializeObject<List<MessageModel>>(mesresult);
 					message = messagelist[0];
 				}
@@ -188,7 +188,7 @@
 			}
 
 			StateHasChanged();
-		});
+		}));
 
 		return hubConnection;
 	}

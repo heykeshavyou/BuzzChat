@@ -82,7 +82,21 @@ namespace BuzzTalk.Server.Controllers
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        
+
+        [HttpGet("GetAllUsersNitin")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllUsersNitin()
+        {
+            var id = 17;
+            var users = await _accountService.GetAllUsers(id);
+            var data = _mapper.Map<List<UserModel>>(users);
+            if (users != null)
+            {
+                return Ok(_mapper.Map<List<UserModelHub>>(data));
+            }
+            return NotFound("No users found");
+        }
+
         [HttpGet("GetAllUsers")]
         [Authorize]
         public async Task<IActionResult> GetAllUsers()
