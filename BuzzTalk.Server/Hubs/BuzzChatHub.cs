@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using BuzzTalk.Business.Dtos;
+using BuzzTalk.Business.Services;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BuzzTalk.Server.Hubs
 {
@@ -20,9 +24,13 @@ namespace BuzzTalk.Server.Hubs
     public class BuzzChatHub : Hub<IbuzzChatHub>
     {
         public static readonly IDictionary<int,UserModelHub> _connectedUsers = new Dictionary<int,UserModelHub>();
-        public BuzzChatHub()
-        {
+        private readonly IMessageService _messageService;
+        private readonly IMapper _mapper;
 
+        public BuzzChatHub(IMessageService messageService,IMapper mapper)
+        {
+            _messageService = messageService;
+            _mapper = mapper;
         }
         public override Task OnConnectedAsync()
         {
@@ -58,6 +66,35 @@ namespace BuzzTalk.Server.Hubs
 
             return base.OnDisconnectedAsync(exception);
         }
+        public async Task<MessageHub> SendMessage(MessageHub message)
+        {
+            var user = this.Context.User;
+            var userId =  int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var messageModel = _mapper.Map<MessageDto>(message);
+            var res = await _messageService.SendMessage(messageModel);
+
+            message = _mapper.Map<MessageHub>(res.Item3);
+            var Receiver = _connectedUsers.FirstOrDefault(x => x.Key == message.ToId).Value;
+            if (Receiver != null)
+            {
+                await Clients.Client(Receiver.ConnectionId).NewMesseageRecived(message);
+            }
+            return message;
+        }
+        //public async Task<List<MessageHub>> MarkRead(MessageHub getmessage)
+        //{
+        //    var messages = await _messageService.MarkRead(getmessage.FromId, getmessage.ToId);
+        //    if (messages != null)
+        //    {
+        //        return messages;
+        //    }
+        //    var Receiver = BuzzChatHub._connectedUsers.FirstOrDefault(x => x.Key == getmessage.ToId).Value;
+        //    if (Receiver != null)
+        //    {
+        //        await Clients.Client(Receiver.ConnectionId).MarkMessagesRead(_mapper.Map<MessageHub>(messages));
+        //    }
+        //    return
+        //}
 
     }
 }

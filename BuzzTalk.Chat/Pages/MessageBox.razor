@@ -1,4 +1,5 @@
-﻿@if (selectedUser != null)
+﻿@inject IJSRuntime JSRuntime
+@if (selectedUser != null)
 {
 	<div class="d-flex flex-column justify-content-between h-100">
 
@@ -81,6 +82,7 @@ else
 		if (!string.IsNullOrWhiteSpace(_newmessage))
 		{
 			await SendMessage.InvokeAsync(_newmessage);
+			await JSRuntime.InvokeVoidAsync("scrollToBottom", "chatBox");
 			_newmessage ="";
 		}
 	}

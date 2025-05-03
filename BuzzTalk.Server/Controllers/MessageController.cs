@@ -64,14 +64,15 @@ namespace BuzzTalk.Server.Controllers
         public async Task<IActionResult> MarkRead(GetmessageModel getmessage)
         {
             var messages = await _messageService.MarkRead(getmessage.FromId, getmessage.ToId);
-            if (messages != null)
-            {
-                return Ok(messages);
-            }
+            
             var Receiver = BuzzChatHub._connectedUsers.FirstOrDefault(x => x.Key == getmessage.ToId).Value;
             if (Receiver != null)
             {
                 await _hubContext.Clients.Client(Receiver.ConnectionId).MarkMessagesRead(_mapper.Map<MessageHub>(messages));
+            }
+            if (messages != null)
+            {
+                return Ok(messages);
             }
             return NotFound("No messages found");
         }

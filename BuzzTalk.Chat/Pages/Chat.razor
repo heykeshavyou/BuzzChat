@@ -55,7 +55,7 @@
 	<div class="header">
 		<h3 class="mb-0">💬 BuzzTalk - Chat</h3>
 		<div>
-			<span class="me-3">👋 Hello, <strong>@AuthenticationState.Name</strong></span>
+			<span class="me-3">👋 Hello, <strong><a href="/profile">@AuthenticationState.Name</a></strong></span>
 			<button class="btn btn-danger btn-sm" @onclick="Logout">Logout</button>
 		</div>
 	</div>
@@ -212,7 +212,8 @@
 	{
 		_selectedUser = user;
 		AllMessage = AllMessages.TryGetValue(user.Id, out var messages) ? messages : new List<MessageModel>();
-		if(AllMessage.Where(x=>x.IsRead).ToList().Count()>0){
+		int count = AllMessage.Count(x => x.IsRead == false && x.FromId != AuthenticationState.Id);
+		if(count>0){
 			var getmessageModel = new GetmessageModel
 				{
 					ToId = user.Id,
@@ -237,6 +238,7 @@
 			}
 		}
 		StateHasChanged();
+
 	}
 
 	public async Task SendMessage(string message)
@@ -250,19 +252,21 @@
 
 		try
 		{
-			var data = JsonConvert.SerializeObject(messageModel);
-			var content = new StringContent(data, Encoding.UTF8, "application/json");
+			// var data = JsonConvert.SerializeObject(messageModel);
+			// var content = new StringContent(data, Encoding.UTF8, "application/json");
 
-			var res = await _httpClient.PostAsync($"{Url.baseUrl}api/Message/SendMessage", content);
-			if (res.IsSuccessStatusCode)
-			{
-				string result = await res.Content.ReadAsStringAsync();
-				var message1 = JsonConvert.DeserializeObject<MessageModel>(result);
+			// var res = await _httpClient.PostAsync($"{Url.baseUrl}api/Message/SendMessage", content);
+			// if (res.IsSuccessStatusCode)
+			// {
+			// 	string result = await res.Content.ReadAsStringAsync();
+			// 	var message1 = JsonConvert.DeserializeObject<MessageModel>(result);
 
-					AllMessages[message1.ToId].Add(message1);
+			// 		AllMessages[message1.ToId].Add(message1);
 
-				StateHasChanged();
-			}
+			// 	StateHasChanged();
+			// }
+			var message1= await _hubConnection.InvokeAsync<MessageModel>("SendMessage", messageModel); 
+			AllMessages[message1.ToId].Add(message1);
 		}
 		catch (Exception ex)
 		{

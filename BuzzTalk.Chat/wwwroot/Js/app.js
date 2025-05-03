@@ -11,8 +11,9 @@ window.scrollPageToBottom = () => {
     window.scrollTo(0, document.body.scrollHeight);
 }
 function scrollToBottom(elementId) {
-    const el = document.getElementById(elementId);
+        const el = document.getElementById(elementId);
     if (el) {
         el.scrollTop = el.scrollHeight;
+        console.log(el)
     }
 }
