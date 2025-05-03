@@ -83,11 +83,15 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
+    options.AddPolicy("AllowAllWithCredentials", policy =>
+    {
+        policy.SetIsOriginAllowed(_ => true)  // Allow any origin
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
+
 // And later
 builder.Services.AddSignalR();
 var mapper = config.CreateMapper();
@@ -101,19 +105,16 @@ builder.Services.AddTransient<IAccountService, AccountService>()
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 app.UseHttpsRedirection();
 
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowAllWithCredentials");
 app.MapControllers();
 
 app.MapHub<BuzzChatHub>("/Buzz/TalkHub");

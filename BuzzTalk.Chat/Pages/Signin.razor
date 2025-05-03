@@ -83,7 +83,7 @@
 			string data = JsonConvert.SerializeObject(signInModel);
 			var content = new StringContent(data, Encoding.UTF8, "application/json");
 
-			var res = await httpClient.PostAsync("https://localhost:7059/api/Account/SignIn", content);
+			var res = await httpClient.PostAsync($"{Url.baseUrl}api/Account/SignIn", content);
 			if (res.IsSuccessStatusCode)
 			{
 				Navigation.NavigateTo("/");

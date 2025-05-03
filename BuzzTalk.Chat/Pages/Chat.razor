@@ -98,7 +98,7 @@
 
 			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthenticationState.Token);
 
-			var response = await _httpClient.GetAsync("https://localhost:7059/api/Account/GetAllUsers");
+			var response = await _httpClient.GetAsync($"{Url.baseUrl}api/Account/GetAllUsers");
 			if (response.IsSuccessStatusCode)
 			{
 				var result = await response.Content.ReadAsStringAsync();
@@ -114,7 +114,7 @@
 					var data = JsonConvert.SerializeObject(getmessageModel);
 					var content = new StringContent(data, Encoding.UTF8, "application/json");
 
-					var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/GetAllMessages", content);
+					var res = await _httpClient.PostAsync($"{Url.baseUrl}api/Message/GetAllMessages", content);
 					var mesresult = await res.Content.ReadAsStringAsync();
 					var messagelist = JsonConvert.DeserializeObject<List<MessageModel>>(mesresult);
 					AllMessages[user.Id] = messagelist;
@@ -132,7 +132,7 @@
 	private HubConnection HubConnecter()
 	{
 		var hubConnection = new HubConnectionBuilder()
-			.WithUrl("https://localhost:7059/Buzz/TalkHub", opt =>
+			.WithUrl($"{Url.baseUrl}Buzz/TalkHub", opt =>
 			{
 				opt.AccessTokenProvider = () => Task.FromResult(AuthenticationState.Token);
 			})
@@ -179,7 +179,7 @@
 
 					var data = JsonConvert.SerializeObject(getmessageModel);
 					var content = new StringContent(data, Encoding.UTF8, "application/json");
-					var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/MarkRead", content);
+					var res = await _httpClient.PostAsync($"{Url.baseUrl}api/Message/MarkRead", content);
 					var mesresult = await res.Content.ReadAsStringAsync();
 					var messagelist = JsonConvert.DeserializeObject<List<MessageModel>>(mesresult);
 					message = messagelist[0];
@@ -221,7 +221,7 @@
 
 			var data = JsonConvert.SerializeObject(getmessageModel);
 			var content = new StringContent(data, Encoding.UTF8, "application/json");
-			var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/MarkRead", content);
+			var res = await _httpClient.PostAsync($"{Url.baseUrl}api/Message/MarkRead", content);
 			var mesresult = await res.Content.ReadAsStringAsync();
 			var messagelist = JsonConvert.DeserializeObject<List<MessageModel>>(mesresult);
 			if (AllMessages.TryGetValue(user.Id, out var messagesInDict))
@@ -253,7 +253,7 @@
 			var data = JsonConvert.SerializeObject(messageModel);
 			var content = new StringContent(data, Encoding.UTF8, "application/json");
 
-			var res = await _httpClient.PostAsync("https://localhost:7059/api/Message/SendMessage", content);
+			var res = await _httpClient.PostAsync($"{Url.baseUrl}api/Message/SendMessage", content);
 			if (res.IsSuccessStatusCode)
 			{
 				string result = await res.Content.ReadAsStringAsync();
