@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using BuzzTalk.Business.Dtos;
-using BuzzTalk.Data.Models;
+using BuzzTalk.Data.Entities;
 using BuzzTalk.Data.Repositries;
 
 namespace BuzzTalk.Business.Services

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BuzzTalk.Data.Entities;
 using BuzzTalk.Data.Helpers;
-using BuzzTalk.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BuzzTalk.Data.Repositries
@@ -34,9 +29,9 @@ namespace BuzzTalk.Data.Repositries
             return null;
         }
 
-        public Task<User> Login(string username ,string password )
+        public async Task<User> Login(string username ,string password )
         {
-            var GetUser = _buzz.Users.FirstOrDefaultAsync(x => x.Username == username.ToLower() && x.Password == PasswordHelper.EncryptPassword(password));
+            var GetUser =await  _buzz.Users.FirstOrDefaultAsync(x => x.Username == username.ToLower() && x.Password == PasswordHelper.EncryptPassword(password));
             if (GetUser != null)
             {
                 return GetUser;

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BuzzTalk.Business.Dtos;
-using BuzzTalk.Data.Models;
+﻿using BuzzTalk.Business.Dtos;
+using BuzzTalk.Data.Entities;
 
 namespace BuzzTalk.Business
 {

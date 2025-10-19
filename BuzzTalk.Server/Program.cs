@@ -1,8 +1,7 @@
 
-using System.Text;
 using BuzzTalk.Business;
 using BuzzTalk.Business.Services;
-using BuzzTalk.Data.Models;
+using BuzzTalk.Data.Entities;
 using BuzzTalk.Data.Repositries;
 using BuzzTalk.Server.Hubs;
 using BuzzTalk.Server.Mapper;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add authentication and authorization services

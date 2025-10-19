@@ -1,14 +1,12 @@
-﻿using BuzzTalk.Server.Hubs;
+﻿using AutoMapper;
+using BuzzTalk.Business.Dtos;
+using BuzzTalk.Business.Services;
+using BuzzTalk.Server.Hubs;
 using BuzzTalk.Server.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using AutoMapper;
-using BuzzTalk.Business.Services;
-using BuzzTalk.Business.Dtos;
-using BuzzTalk.Data.Models;
+using System.Security.Claims;
 
 namespace BuzzTalk.Server.Controllers
 {

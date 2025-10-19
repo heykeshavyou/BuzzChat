@@ -1,19 +1,15 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using BuzzTalk.Business.Dtos;
 using BuzzTalk.Business.Services;
-using BuzzTalk.Data.Models;
-using BuzzTalk.Data.Repositries;
 using BuzzTalk.Server.Hubs;
 using BuzzTalk.Server.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace BuzzTalk.Server.Controllers
 {
@@ -81,20 +77,6 @@ namespace BuzzTalk.Server.Controllers
                 signingCredentials: credentials
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        [HttpGet("GetAllUsersNitin")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAllUsersNitin()
-        {
-            var id = 17;
-            var users = await _accountService.GetAllUsers(id);
-            var data = _mapper.Map<List<UserModel>>(users);
-            if (users != null)
-            {
-                return Ok(_mapper.Map<List<UserModelHub>>(data));
-            }
-            return NotFound("No users found");
         }
 
         [HttpGet("GetAllUsers")]
