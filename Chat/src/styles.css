@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@tailwind utilities;
+.btn{
+  @apply bg-[#191919] text-[14px] py-2 px-4 font-medium text-white  rounded-full cursor-pointer transition-all duration-200;
+}
+.btn:active{
+    @apply scale-105;
+}
