@@ -34,8 +34,8 @@ namespace BuzzTalk.Server.Hubs
         }
         public override Task OnConnectedAsync()
         {
-            //var user = this.Context.User;
-            //var userName = user.FindFirst(ClaimTypes.Name);
+            var user = this.Context.User;
+            var userName = user.FindFirst(ClaimTypes.Name);
             return base.OnConnectedAsync();
         }
         public async Task ConnectUser(UserModelHub user)
@@ -46,6 +46,7 @@ namespace BuzzTalk.Server.Hubs
                 user.ConnectionId = Context.ConnectionId;
                 _connectedUsers.ContainsKey(user.Id);
                 _connectedUsers.Add(user.Id, user);
+                Console.WriteLine(_connectedUsers);
             }
            await Clients.Others.UserConnected(user);
         }
