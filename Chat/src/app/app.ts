@@ -9,11 +9,9 @@ import { UserService } from './Services/User/user-service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App  implements OnInit{
-  constructor(private _userService:UserService,private _router:Router){
+export class App{
+  constructor(){
 
   }
-  ngOnInit(): void {
-    this._userService.GetUser();
-  } 
+
 }

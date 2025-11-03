@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import User from '../../Models/User';
 import Login from '../../Models/Login';
+import { SignUp } from '../../Models/SignUp';
 
 @Injectable({
   providedIn: 'root',
@@ -15,4 +16,8 @@ export class ApiService {
   Login(model:Login):Observable<User>{
     return this._httpClient.post<User>(`${this.baseUrl}Account/Login`,model);
   }
+  SignUp(model:SignUp):Observable<string>{
+    return this._httpClient.post<string>(`${this.baseUrl}Account/Login`,model);
+  }
+  
 }

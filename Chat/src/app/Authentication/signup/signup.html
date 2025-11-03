@@ -1,1 +1,67 @@
-<p>signup works!</p>
+<div class="place-content-center grid h-screen">
+  <div class="w-[400px] shadow-xl rounded-[5px] border border-gray-300 p-4">
+    <div>
+      <h1 class="text-3xl font-semibold mb-5">Sign-Up</h1>
+      <form ngForm (submit)="SignUp($event)">
+        <div class="flex flex-col w-90 gap-y-3.5">
+            <div class="flex flex-col w-90">
+            <input
+              class="bg-[#f2f2f2] py-2 px-3 rounded-[5px] mb-1 text-[14px] placeholder-gray-600 focus-visible:outline-black"
+              placeholder="Name"
+              [formControl]="Name"
+              type="text"
+            />
+            @if(Name.touched){ @if(Name.errors?.['required']){
+            <span class="text-[12px] text-red-600">Name is required</span>
+            } }
+          </div>
+          <div class="flex flex-col w-90">
+            <input
+              class="bg-[#f2f2f2] py-2 px-3 rounded-[5px] mb-1 text-[14px] placeholder-gray-600 focus-visible:outline-black"
+              placeholder="Username"
+              [formControl]="Username"
+              type="text"
+            />
+            @if(Username.touched){ @if(Username.errors?.['required']){
+            <span class="text-[12px] text-red-600">Username is required</span>
+            } }
+          </div>
+          <div class="flex flex-col w-90">
+            <input
+              class="bg-[#f2f2f2] py-2 px-3 rounded-[5px] mb-1 text-[14px] placeholder-gray-600 focus-visible:outline-black"
+              placeholder="Email"
+              [formControl]="Email"
+              type="text"
+            />
+            @if(Email.touched){ @if(Email.errors?.['required']){
+            <span class="text-[12px] text-red-600">Email is required</span>
+            } }
+          </div>
+          <div class="flex flex-col w-90">
+            <input
+              class="bg-[#f2f2f2] py-2 px-3 rounded-[5px] mb-1 text-[14px] placeholder-gray-600 focus-visible:outline-black"
+              placeholder="Password"
+              [formControl]="Password"
+              type="text"
+            />
+            @if(Password.touched){ @if(Password.errors?.['required']){
+            <span class="text-[12px] text-red-600">Password is required</span>
+            } }
+          </div>
+          <div class="flex justify-center my-2">
+            <button class="btn w-30">
+              @if(Loading()){
+              <div class="w-20 flex justify-center">
+                <Loading [IsBlack]="false" width="22px" />
+              </div>
+              }@else{
+              <span class="">Login</span>
+              }
+            </button>
+          </div>
+        </div>
+      </form>
+      <p class="text-center mt-3 mb-10 text-[14px]">Already have an account. <span><a [routerLink]="['/login']" class="underline">Login</a> </span> </p>
+    </div>
+  </div>
+</div>

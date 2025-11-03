@@ -26,6 +26,7 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@microsoft/signalr": "^9.0.6",
     "@tailwindcss/postcss": "^4.1.16",
     "lottie-web": "^5.13.0",
     "ngx-lottie": "^20.0.0",
