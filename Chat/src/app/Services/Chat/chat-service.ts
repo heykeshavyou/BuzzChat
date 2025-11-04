@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { UserService } from '../User/user-service';
+import { UserHub } from '../../Models/UserHub';
+import { ApiService } from '../Api/api-service';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -9,7 +12,9 @@ import { UserService } from '../User/user-service';
 export class ChatService {
   private _hubConnection: signalR.HubConnection|null=null;
   private baseUrl="http://192.168.1.35:5500/";
-  constructor(private _userService:UserService){
+  Users:UserHub[]=[];
+  CurrentUser:UserHub|null=null;
+  constructor(private _userService:UserService,private _router:Router){
     
   }
   public Start=()=>{
@@ -31,5 +36,15 @@ export class ChatService {
     }).catch((error)=>{
       console.log(error);
     })
+  }
+
+  SetUser(id:Number){
+    let index = this.Users.findIndex(x=>x.id==id);
+    if(index!=-1){
+      this.CurrentUser=this.Users[index];
+      if(window.innerWidth<1280){
+        this._router.navigate(['/chat']);
+      }
+    }
   }
 }

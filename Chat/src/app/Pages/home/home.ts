@@ -1,23 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { UserService } from '../../Services/User/user-service';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet, RouterLinkWithHref } from '@angular/router';
 import { ChatService } from '../../Services/Chat/chat-service';
+import { Chat } from '../chat/chat';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [RouterOutlet, RouterLinkWithHref, Chat],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
-  constructor(private _userService: UserService, private _router: Router,private _chatService:ChatService) {
-
+  initialInnerWidth: number;
+  constructor(
+    private _userService: UserService,
+    private _router: Router,
+    public _chatService: ChatService
+  ) {
+    this.initialInnerWidth = window.innerWidth;
   }
   ngOnInit(): void {
-    if (this._userService.user==null) {
-      this._router.navigate(["/login"]);
-    }else{
+    if (this._userService.user == null) {
+      this._router.navigate(['/login']);
+    } else {
       this._chatService.Start();
     }
+  }
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    let a = (event.target as Window).innerWidth;
+    this.initialInnerWidth = a;
+
   }
 }

@@ -1,0 +1,23 @@
+@if(ChatService.CurrentUser!=null){
+<div>
+  <div class="border-b p-3 border-gray-300">
+    <div class="flex items-center gap-2.5">
+      <div>
+        <img
+          src="/16.png"
+          height="40"
+          width="40"
+          class="aspect-square object-contain"
+        />
+      </div>
+      <div>
+        <p class="capitalize font-medium">
+          {{ ChatService.CurrentUser.name }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+}@else{
+<p>Click a person to chat</p>
+}
