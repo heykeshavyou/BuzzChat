@@ -1,23 +1,59 @@
-@if(ChatService.CurrentUser!=null){
-<div>
-  <div class="border-b p-3 border-gray-300">
-    <div class="flex items-center gap-2.5">
-      <div>
-        <img
-          src="/16.png"
-          height="40"
-          width="40"
-          class="aspect-square object-contain"
-        />
-      </div>
-      <div>
-        <p class="capitalize font-medium">
-          {{ ChatService.CurrentUser.name }}
-        </p>
+@if(ChatService.CurrentGroup!=null){
+<div class="grid grid-row-14 h-full bg-[#F3EFE8]">
+  <div class="row-span-2">
+    <div class="border-b p-3 shadow-xs border-gray-300 bg-white">
+      <div class="flex items-center gap-2.5">
+        <div>
+          <img
+            src="/16.png"
+            height="40"
+            width="40"
+            class="aspect-square object-contain"
+          />
+        </div>
+        <div>
+          <p class="capitalize font-medium">
+            {{
+              ChatService.CurrentGroup.name == null
+                ? GetChatName()
+                : ChatService.CurrentGroup.name
+            }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="flex flex-col row-span-12 justify-end p-3">
+    <div>
+      @for (item of ChatService.CurrentGroup.messages; track $index) {
+        <p class="">{{item.content}}</p>
+      }
+    </div>
+
+    <div
+      class="bg-white w-full p-1 px-3 shadow-2xl flex items-center rounded-full"
+    >
+      <form ngForm (submit)="SendMessage($event)" class="w-full">
+        <div class="flex justify-between">
+          <input
+            class="w-[90%] py-2 px-3 rounded-[5px] mb-1 text-[16px] placeholder-gray-600 focus-visible:outline-none"
+            placeholder="Type a message"
+            autofocus
+            [formControl]="Message"
+            type="text"
+          />
+          @if(Message.value!=""){
+          <button class="me-1">
+            <img src="/send.svg" width="25"  />
+          </button>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
+
 }@else{
 <p>Click a person to chat</p>
 }

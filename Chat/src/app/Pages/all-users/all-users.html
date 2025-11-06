@@ -1,0 +1,29 @@
+<div class="p-3">
+  @if(Loading()){
+  <div class="flex justify-center pt-40">
+    <Loading [IsBlack]="true" width="100px" />
+  </div>
+  }@else {
+  <div>
+    @for (item of ChatService.Users; track $index) {
+    <div>
+      <button class="w-full" (click)="ChatService.CreateNewChat(item.id)">
+        <div class="my-1 p-2 person flex gap-x-2.5">
+          <div>
+            <img
+              src="/16.png"
+              height="50"
+              width="50"
+              class="aspect-square object-contain"
+            />
+          </div>
+          <div class="py-2">
+            <p class="capitalize">{{ item.name }}</p>
+          </div>
+        </div>
+      </button>
+    </div>
+    }
+  </div>
+  }
+</div>

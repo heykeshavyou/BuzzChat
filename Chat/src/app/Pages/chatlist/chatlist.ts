@@ -3,10 +3,11 @@ import { ChatService } from '../../Services/Chat/chat-service';
 import { ApiService } from '../../Services/Api/api-service';
 import { UserService } from '../../Services/User/user-service';
 import { Loading } from '../../Components/Loading';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-chatlist',
-  imports: [Loading],
+  imports: [Loading, RouterLink],
   templateUrl: './chatlist.html',
   styleUrl: './chatlist.css',
 })
@@ -18,18 +19,26 @@ export class Chatlist implements OnInit {
     private _userService: UserService
   ) {}
   ngOnInit(): void {
-    this.GetUsers();
+    if (this.ChatService.Groups.length == 0) {
+      this.GetGroups();
+    } else {
+      this.Loading.set(false);
+    }
   }
-  GetUsers() {
+  GetGroups() {
     this.Loading.set(true);
-    this._apiService.GetUsers(this._userService.user?.token ?? '').subscribe(
+    this._apiService.GetGroups(this._userService.user?.token ?? '').subscribe(
       (res) => {
-        this.ChatService.Users = res;
-          },
+        this.ChatService.Groups = res;
+        console.log(this.ChatService.Groups)
+      },
       (error) => {},
       () => {
         this.Loading.set(false);
       }
     );
+  }
+  GetChatName(id: number) {
+    return this.ChatService.GetChatName(id);
   }
 }
