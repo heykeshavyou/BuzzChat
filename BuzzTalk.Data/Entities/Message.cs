@@ -17,7 +17,11 @@ public partial class Message
 
     public bool IsRead { get; set; }
 
+    public int? GroupId { get; set; }
+
     public virtual User? From { get; set; }
+
+    public virtual Group? Group { get; set; }
 
     public virtual User? To { get; set; }
 }

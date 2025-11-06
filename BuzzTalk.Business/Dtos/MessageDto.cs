@@ -18,6 +18,8 @@ namespace BuzzTalk.Business.Dtos
 
         public DateTime? SentOn { get; set; }
         public bool IsRead { get; set; }
+        public int? GroupId { get; set; }
+
 
 
         public virtual UserDto? From { get; set; }

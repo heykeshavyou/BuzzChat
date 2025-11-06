@@ -2,18 +2,18 @@
 using BuzzTalk.Data.Helpers;
 using Microsoft.EntityFrameworkCore;
 
-namespace BuzzTalk.Data.Repositries
+namespace BuzzTalk.Data.Repositories
 {
-    public interface IAccountRepositry
+    public interface IAccountRepository
     {
         Task<(bool, string, int)> SignIn(User user);
         Task<User> Login(string username ,string password);
         Task<List<User>> GetAllUsers(int id);
     }
-    public class AccountRepositry : IAccountRepositry
+    public class AccountRepository : IAccountRepository
     {
         private readonly BuzzTalkContext _buzz;
-        public AccountRepositry(BuzzTalkContext buzz)
+        public AccountRepository(BuzzTalkContext buzz)
         {
             _buzz = buzz;
 

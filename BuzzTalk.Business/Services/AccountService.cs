@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BuzzTalk.Business.Dtos;
 using BuzzTalk.Data.Entities;
-using BuzzTalk.Data.Repositries;
+using BuzzTalk.Data.Repositories;
 
 namespace BuzzTalk.Business.Services
 {
@@ -13,9 +13,9 @@ namespace BuzzTalk.Business.Services
     }
     public class AccountService : IAccountService
     {
-        private readonly IAccountRepositry _accountRepositry;
+        private readonly IAccountRepository _accountRepositry;
         private readonly IMapper _mapper;
-        public AccountService(IAccountRepositry accountRepositry, IMapper mapper)
+        public AccountService(IAccountRepository accountRepositry, IMapper mapper)
         {
             _accountRepositry = accountRepositry;
             _mapper = mapper;

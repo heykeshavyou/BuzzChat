@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BuzzTalk.Business.Dtos;
 using BuzzTalk.Data.Entities;
-using BuzzTalk.Data.Repositries;
+using BuzzTalk.Data.Repositories;
 
 namespace BuzzTalk.Business.Services
 {
@@ -13,10 +13,10 @@ namespace BuzzTalk.Business.Services
     }
     public class MessageService : IMessageService
     {
-        private readonly IMessageRepositry _message;
+        private readonly IMessageRepository _message;
         private readonly IMapper _mapper;
 
-        public MessageService(IMessageRepositry message,IMapper mapper)
+        public MessageService(IMessageRepository message,IMapper mapper)
         {
             _message = message;
             _mapper = mapper;

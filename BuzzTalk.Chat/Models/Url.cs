@@ -8,7 +8,7 @@ namespace BuzzTalk.Chat.Models
         private const bool ISLOCALHOST = true;
         private const bool ISLIVE = false;
         public static string liveUrl = "http://heykeshav-001-site1.ntempurl.com/";
-        public static string LocalUrl = ISLOCALHOST? "http://192.168.1.11/" : "https://localhost:7059/";
+        public static string LocalUrl = ISLOCALHOST? "http://192.168.1.9/" : "https://localhost:7059/";
 
         public static string baseUrl = ISLIVE ? liveUrl : LocalUrl;
 

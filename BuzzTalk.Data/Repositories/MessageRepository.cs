@@ -1,21 +1,23 @@
 ﻿using BuzzTalk.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BuzzTalk.Data.Repositries
+namespace BuzzTalk.Data.Repositories
 {
-    public interface IMessageRepositry
+    public interface IMessageRepository
     {
        Task<(bool, string,Message)> SendMessage(Message message);
        Task<List<Message>> GetAllMessages(int fromId, int toId);
         Task<List<Message>> MarkRead(int fromId, int toId);
     }
-    public class MessageRepositry : IMessageRepositry
+    public class MessageRepository : IMessageRepository
     {
         private readonly BuzzTalkContext _context;
+        private readonly IGroupRepository _groupRepository;
 
-        public MessageRepositry(BuzzTalkContext context)
+        public MessageRepository(BuzzTalkContext context, IGroupRepository groupRepository)
         {
             _context = context;
+            _groupRepository = groupRepository;
         }
 
         public async Task<List<Message>> GetAllMessages(int fromId, int toId)
@@ -47,6 +49,18 @@ namespace BuzzTalk.Data.Repositries
         {
             try
             {
+                if (message.GroupId == null)
+                {
+                   var res =await _groupRepository.CreateOneToOneChat((int)message.ToId, (int)message.FromId);
+                    if(res != null)
+                    {
+                        message.GroupId=res.Id;
+                    }
+                    else
+                    {
+                        return (false, "Message not sent", message);
+                    }
+                }
                 message.SentOn = DateTime.Now;
                 await _context.Messages.AddAsync(message);
                 await _context.SaveChangesAsync();

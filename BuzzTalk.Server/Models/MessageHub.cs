@@ -9,5 +9,7 @@
         public bool IsRead { get; set; }
 
         public int ToId { get; set; }
+        public int? GroupId { get; set; }
+
     }
 }

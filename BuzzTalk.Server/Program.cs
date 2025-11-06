@@ -2,7 +2,7 @@
 using BuzzTalk.Business;
 using BuzzTalk.Business.Services;
 using BuzzTalk.Data.Entities;
-using BuzzTalk.Data.Repositries;
+using BuzzTalk.Data.Repositories;
 using BuzzTalk.Server.Hubs;
 using BuzzTalk.Server.Mapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -96,10 +96,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddSignalR();
 var mapper = config.CreateMapper();
 builder.Services.AddSingleton(mapper);
-builder.Services.AddTransient<IAccountService, AccountService>()
-.AddTransient<IMessageService, MessageService>()
-.AddTransient<IAccountRepositry, AccountRepositry>()
-.AddTransient<IMessageRepositry, MessageRepositry>();
+builder.Services
+    .AddTransient<IAccountService, AccountService>()
+    .AddTransient<IMessageService, MessageService>()
+    .AddTransient<IAccountRepository, AccountRepository>()
+    .AddTransient<IMessageRepository, MessageRepository>()
+    .AddTransient<IGroupRepository, GroupRepository>()
+    .AddTransient<IGroupService,GroupService>();
 
 
 

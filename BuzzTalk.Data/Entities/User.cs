@@ -17,6 +17,10 @@ public partial class User
 
     public DateTime? JoinedOn { get; set; }
 
+    public virtual ICollection<GroupUser> GroupUsers { get; set; } = new List<GroupUser>();
+
+    public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
+
     public virtual ICollection<Message> MessageFroms { get; set; } = new List<Message>();
 
     public virtual ICollection<Message> MessageTos { get; set; } = new List<Message>();
