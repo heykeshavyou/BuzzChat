@@ -18,7 +18,7 @@ namespace BuzzTalk.Server.Hubs
         Task ConnectedUsers(IEnumerable<UserModelHub> users);
         Task UserDisconnected(UserModelHub user);
         Task  NewUserSignIn(UserModelHub user);
-        Task NewMesseageRecived(MessageHub message);
+        Task NewMessageReceive(MessageHub message);
         Task MarkMessagesRead(MessageHub message);
     }
     public class BuzzChatHub : Hub<IbuzzChatHub>
@@ -78,7 +78,7 @@ namespace BuzzTalk.Server.Hubs
             var Receiver = _connectedUsers.FirstOrDefault(x => x.Key == message.ToId).Value;
             if (Receiver != null)
             {
-                await Clients.Client(Receiver.ConnectionId).NewMesseageRecived(message);
+                await Clients.Client(Receiver.ConnectionId).NewMessageReceive(message);
             }
             return message;
         }
