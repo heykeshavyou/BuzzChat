@@ -25,14 +25,33 @@
   </div>
 
   <div class="flex flex-col row-span-12 justify-end p-3">
-    <div>
+    <div class="overflow-y-scroll h-[68vh] messages" #chatContainer>
       @for (item of ChatService.CurrentGroup.messages; track $index) {
-        <p class="">{{item.content}}</p>
+      <div
+        class="flex my-1"
+        [ngClass]="[item.fromId == User?.id ? 'justify-end' : 'justify-start']"
+      >
+        <div class="w-1/2 flex" [ngClass]="[item.fromId == User?.id ? 'justify-end' : 'justify-start']">
+          <div
+            class="bg-white  text-[16px] gap-2 px-2 py-1 rounded-[5px] flex items-center"
+          >
+            <p class="break-all">
+              {{ item.content }}
+            </p>
+
+            <div class="flex items-end h-full">
+              <p class="text-gray-400 text-[10px] ">
+                {{ item.sentOn | date : "h:mm a" }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
       }
     </div>
 
     <div
-      class="bg-white w-full p-1 px-3 shadow-2xl flex items-center rounded-full"
+      class="bg-white w-full p-1 px-3 mt-2 shadow-2xl flex items-center rounded-full"
     >
       <form ngForm (submit)="SendMessage($event)" class="w-full">
         <div class="flex justify-between">
@@ -45,7 +64,7 @@
           />
           @if(Message.value!=""){
           <button class="me-1">
-            <img src="/send.svg" width="25"  />
+            <img src="/send.svg" width="25" />
           </button>
           }
         </div>
@@ -55,5 +74,7 @@
 </div>
 
 }@else{
-<p>Click a person to chat</p>
+  <div class="h-full flex justify-center items-center">
+    <p class=" text-3xl">Hey 👋, {{User?.name}} 😊</p>
+  </div>
 }

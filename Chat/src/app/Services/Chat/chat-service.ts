@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { UserService } from '../User/user-service';
 import { UserHub } from '../../Models/UserHub';
@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import Group from '../../Models/Group';
 import Message from '../../Models/Message';
 import { ApiService } from '../Api/api-service';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -19,10 +20,14 @@ export class ChatService {
   Users: UserHub[] = [];
   Groups: Group[] = [];
   CurrentGroup: Group | null = null;
+  public messagesChanged$ = new Subject<void>();
+  ActiveUsers: UserHub[] = [];
+
   constructor(
     private _userService: UserService,
     private _router: Router,
-    private _apiService: ApiService
+    private _apiService: ApiService,
+    private zone: NgZone
   ) {}
   public Start = () => {
     this._hubConnection = new signalR.HubConnectionBuilder()
@@ -47,7 +52,6 @@ export class ChatService {
         console.log(error);
       });
   };
-
   SetUser(id: Number) {
     let index = this.Groups.findIndex((x) => x.id == id);
     if (index != -1) {
@@ -77,10 +81,15 @@ export class ChatService {
   }
   SendMessage(message: Message) {
     this._hubConnection?.invoke('SendMessage', message).then((res) => {
-      console.log(res);
-      if (message.groupId == null) {
-        this.GetGroupById(res.groupId);
-      }
+      this.zone.run(() => {
+        if (message.groupId == null) {
+          this.GetGroupById(res.groupId);
+        }
+        let index = this.Groups.findIndex((x) => x.id == res.groupId);
+        this.Groups[index].messages?.push(res);
+        this.CurrentGroup = this.Groups[index];
+        this.messagesChanged$.next();
+      });
     });
   }
   GetCurrentGroupUser(): UserHub | undefined {
@@ -112,10 +121,69 @@ export class ChatService {
       .subscribe(
         (res) => {
           this.Groups.push(res);
-          this.CurrentGroup=res;
-          console.log(this.Groups);
+          this.CurrentGroup = res;
         },
         (err) => {}
       );
+  }
+  MessageRecieve() {
+    this._hubConnection?.on('NewMessageReceive', (message: Message) => {
+      this.zone.run(() => {
+        let index = this.Groups.findIndex((x) => x.id == message.groupId);
+        if (index != -1) {
+          this.Groups[index].messages?.push(message);
+          if (
+            this.CurrentGroup?.id == message.groupId &&
+            this.CurrentGroup != null
+          ) {
+            this.CurrentGroup = this.Groups[index];
+          }
+        }
+        this.messagesChanged$.next();
+      });
+    });
+  }
+  GetOnlineUsers() {
+    this._hubConnection?.on('ConnectedUsers', (users: UserHub[]) => {
+      this.zone.run(() => {
+        this.ActiveUsers = users;
+        this.messagesChanged$.next();
+      });
+    });
+  }
+  UserDisconnected() {
+    this._hubConnection?.on('UserDisconnected', (user: UserHub) => {
+      this.zone.run(() => {
+        let index = this.ActiveUsers.findIndex((x) => x.id == user.id);
+        if (index != -1) {
+          this.ActiveUsers.splice(index, 1);
+          this.messagesChanged$.next();
+        }
+      });
+    });
+  }
+  UserConnected() {
+    this._hubConnection?.on('UserConnected', (user: UserHub) => {
+      this.zone.run(() => {
+        this.ActiveUsers.push(user);
+        this.messagesChanged$.next();
+      });
+    });
+  }
+  GetActiveUser(id: number) {
+    let user = this.GetGroupUser(id);
+    if (user != null) {
+      let index = this.ActiveUsers.findIndex((x) => x.id == user.id);
+      return index == -1 ? false : true;
+    }
+    return false;
+  }
+  GetGroupUser(id: number): UserHub | null {
+    let group = this.Groups.find((x) => x.id == id);
+    if (group?.users?.length == 2) {
+      let user = group.users.filter((x) => x.id != this._userService.user?.id);
+      return user[0] ?? null;
+    }
+    return null;
   }
 }

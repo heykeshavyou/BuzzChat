@@ -12,3 +12,6 @@
 .person{
   @apply cursor-pointer  hover:bg-gray-300 transition-all duration-200 rounded-[10px];
 }
+.messages::-webkit-scrollbar {
+  display: none;
+}

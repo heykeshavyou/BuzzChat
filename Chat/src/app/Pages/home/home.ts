@@ -24,12 +24,19 @@ export class Home implements OnInit {
       this._router.navigate(['/login']);
     } else {
       this._chatService.Start();
+      this._chatService.MessageRecieve();
+      this._chatService.GetOnlineUsers();
+      this._chatService.UserDisconnected();
+      this._chatService.UserConnected();
     }
   }
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     let a = (event.target as Window).innerWidth;
     this.initialInnerWidth = a;
-
+  }
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscape(event: Event) {
+    this._chatService.CurrentGroup = null;
   }
 }

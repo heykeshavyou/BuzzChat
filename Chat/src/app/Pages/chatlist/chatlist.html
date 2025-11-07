@@ -20,23 +20,55 @@
     <div>
       <button class="w-full" (click)="ChatService.SetUser(item.id ?? 0)">
         <div class="my-1 p-2 person flex gap-x-2.5">
-          <div>
+          <div class="flex justify-center items-center relative">
             <img
               src="/16.png"
               height="50"
               width="50"
               class="aspect-square object-contain"
             />
-          </div>
-          <div class="py-1">
-            <p class="capitalize">
               @if(item.name==null||item.name==""){
-              {{ GetChatName(item.id ?? 0) }}
+                @if(ChatService.GetActiveUser(item.id??0)){
+                  <div class=" p-1 rounded-full bg-white absolute bottom-0 right-0">
+                    <div class="w-3 rounded-full h-3 bg-green-400">
+
+                    </div>
+                  </div>
+                }
+              @else{
+                <div class=" p-1 rounded-full bg-white absolute bottom-0 right-0">
+                    <div class="w-3 rounded-full h-3 bg-red-400">
+
+                    </div>
+                  </div>
               }
-            </p>
-            @if(item.messages){
-              <p class="text-[14px] text-start text-gray-400">{{item.messages[item.messages.length-1].content}}</p>
-            }
+              }
+          </div>
+          <div class="py-1 w-full">
+            <div class="flex justify-between">
+              <p class="capitalize text-start">
+                @if(item.name==null||item.name==""){
+                {{ GetChatName(item.id ?? 0) }}
+                }
+              </p>
+              <p class="text-[12px] text-gray-400 capitalize">
+                @if(item.messages){
+                {{
+                  item.messages[item.messages.length - 1].sentOn
+                    | date : "h:mm a"
+                }}
+                }
+              </p>
+            </div>
+            <div class="w-full">
+              @if(item.messages){
+              <p
+                class="text-[14px] text-start truncate text-gray-400 w-[200px]"
+              >
+                {{ item.messages[item.messages.length - 1].content }}
+              </p>
+              }
+            </div>
           </div>
         </div>
       </button>
