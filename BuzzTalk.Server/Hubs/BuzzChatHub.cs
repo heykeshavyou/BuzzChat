@@ -20,17 +20,21 @@ namespace BuzzTalk.Server.Hubs
         Task  NewUserSignIn(UserModelHub user);
         Task NewMessageReceive(MessageHub message);
         Task MarkMessagesRead(MessageHub message);
+        Task NewGroupCreated(GroupModel group);
     }
+    [Authorize]
     public class BuzzChatHub : Hub<IbuzzChatHub>
     {
         public static readonly IDictionary<int,UserModelHub> _connectedUsers = new Dictionary<int,UserModelHub>();
         private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
+        private readonly IGroupService _groupService;
 
-        public BuzzChatHub(IMessageService messageService,IMapper mapper)
+        public BuzzChatHub(IMessageService messageService,IMapper mapper,IGroupService groupService)
         {
             _messageService = messageService;
             _mapper = mapper;
+            _groupService = groupService;
         }
         public override Task OnConnectedAsync()
         {
@@ -73,9 +77,18 @@ namespace BuzzTalk.Server.Hubs
             var userId =  int.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value);
             var messageModel = _mapper.Map<MessageDto>(message);
             var res = await _messageService.SendMessage(messageModel);
+            var Receiver = _connectedUsers.FirstOrDefault(x => x.Key == message.ToId).Value;
+
+            if (res.Item3.GroupId != messageModel.GroupId)
+            {
+                var group = await _groupService.GetGroup(res.Item3.GroupId??0);
+                if (group != null&& Receiver!=null)
+                {
+                    await Clients.Client(Receiver.ConnectionId).NewGroupCreated(_mapper.Map<GroupModel>(group));
+                }
+            }
 
             message = _mapper.Map<MessageHub>(res.Item3);
-            var Receiver = _connectedUsers.FirstOrDefault(x => x.Key == message.ToId).Value;
             if (Receiver != null)
             {
                 await Clients.Client(Receiver.ConnectionId).NewMessageReceive(message);
