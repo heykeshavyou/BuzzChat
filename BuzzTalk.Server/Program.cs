@@ -83,15 +83,14 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllWithCredentials", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.SetIsOriginAllowed(_ => true)  // Allow any origin
+        policy.WithOrigins("http://localhost:4200")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
     });
 });
-
 // And later
 builder.Services.AddSignalR();
 var mapper = config.CreateMapper();
@@ -110,14 +109,14 @@ var app = builder.Build();
 
     app.UseSwagger();
     app.UseSwaggerUI();
-
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-app.UseCors("AllowAllWithCredentials");
+
 app.MapControllers();
 
 app.MapHub<BuzzChatHub>("/Buzz/TalkHub");

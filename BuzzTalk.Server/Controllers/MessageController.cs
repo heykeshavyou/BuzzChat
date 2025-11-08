@@ -43,7 +43,7 @@ namespace BuzzTalk.Server.Controllers
             var Receiver = BuzzChatHub._connectedUsers.FirstOrDefault(x => x.Key == message.ToId).Value;
             if (Receiver!=null)
             {
-                await _hubContext.Clients.Client(Receiver.ConnectionId).NewMesseageRecived(message);
+                await _hubContext.Clients.Client(Receiver.ConnectionId).NewMessageReceive(message);
             }
             return Ok(message);
         }
