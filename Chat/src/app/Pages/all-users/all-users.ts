@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
 import { Loading } from '../../Components/Loading';
 import { ChatService } from '../../Services/Chat/chat-service';
 import { ApiService } from '../../Services/Api/api-service';
@@ -15,12 +15,16 @@ export class AllUsers implements OnInit {
   constructor(
     public ChatService: ChatService,
     private _apiService: ApiService,
-    private _userService: UserService
+    private _userService: UserService,
+    private _cdr: ChangeDetectorRef
   ) {}
   ngOnInit(): void {
     if (this.ChatService.Users.length == 0) {
       this.GetUsers();
     }
+    this.ChatService.messagesChanged$.subscribe(() => {
+      this._cdr.detectChanges();
+    });
   }
   GetUsers() {
     this.Loading.set(true);
