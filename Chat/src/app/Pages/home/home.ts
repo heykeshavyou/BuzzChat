@@ -28,6 +28,7 @@ export class Home implements OnInit {
       this._chatService.GetOnlineUsers();
       this._chatService.UserDisconnected();
       this._chatService.UserConnected();
+      this._chatService.NewGroupCreated();
     }
   }
   @HostListener('window:resize', ['$event'])

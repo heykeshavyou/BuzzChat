@@ -7,6 +7,7 @@ import Group from '../../Models/Group';
 import Message from '../../Models/Message';
 import { ApiService } from '../Api/api-service';
 import { Subject } from 'rxjs';
+import User from '../../Models/User';
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +37,7 @@ export class ChatService {
           return this._userService.user?.token ?? '';
         },
       })
+      .withAutomaticReconnect()
       .build();
     let model = {
       Id: this._userService.user?.id,
@@ -131,12 +133,18 @@ export class ChatService {
       this.zone.run(() => {
         let index = this.Groups.findIndex((x) => x.id == message.groupId);
         if (index != -1) {
-          this.Groups[index].messages?.push(message);
           if (
-            this.CurrentGroup?.id == message.groupId &&
-            this.CurrentGroup != null
+            this.Groups[index].messages?.findIndex((x) => x.id != message.id) ==
+            -1
           ) {
-            this.CurrentGroup = this.Groups[index];
+            console.log(message);
+            this.Groups[index].messages?.push(message);
+            if (
+              this.CurrentGroup?.id == message.groupId &&
+              this.CurrentGroup != null
+            ) {
+              this.CurrentGroup = this.Groups[index];
+            }
           }
         }
         this.messagesChanged$.next();
@@ -166,6 +174,23 @@ export class ChatService {
     this._hubConnection?.on('UserConnected', (user: UserHub) => {
       this.zone.run(() => {
         this.ActiveUsers.push(user);
+        this.messagesChanged$.next();
+      });
+    });
+  }
+  NewGroupCreated() {
+    this._hubConnection?.on('NewGroupCreated', (group: Group) => {
+      this.zone.run(() => {
+        group.messages=[];
+        this.Groups.push(group);
+        this.messagesChanged$.next();
+      });
+    });
+  }
+  NewUserSignUp() {
+    this._hubConnection?.on('NewUserSignIn', (user: UserHub) => {
+      this.zone.run(() => {
+        this.Users.push(user);
         this.messagesChanged$.next();
       });
     });
