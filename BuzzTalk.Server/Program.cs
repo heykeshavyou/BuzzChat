@@ -102,11 +102,8 @@ builder.Services
     .AddTransient<IMessageRepository, MessageRepository>()
     .AddTransient<IGroupRepository, GroupRepository>()
     .AddTransient<IGroupService,GroupService>();
-
-
-
 var app = builder.Build();
-
+app.UseStaticFiles();
     app.UseSwagger();
     app.UseSwaggerUI();
 app.UseHttpsRedirection();

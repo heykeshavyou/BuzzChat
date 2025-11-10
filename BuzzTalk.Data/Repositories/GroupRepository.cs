@@ -6,7 +6,7 @@ namespace BuzzTalk.Data.Repositories
 {
     public interface IGroupRepository
     {
-        Task<Group> CreateGroup(Group group);
+        Task<Group> CreateGroup(Group group,List<int> users);
         Task<Group> CreateOneToOneChat(int toId , int fromId);
         Task<List<Group>> GetAllGroups(int userId);
         Task<Group> GetGroupById(int id);
@@ -21,9 +21,25 @@ namespace BuzzTalk.Data.Repositories
         {
             _db = db;
         }
-        public async Task<Group> CreateGroup(Group group)
+        public async Task<Group> CreateGroup(Group group, List<int> users)
         {
+            group.Guid = GuidGenerator();
+            group.CreatedTime = DateTime.Now;
             await _db.Groups.AddAsync(group);
+            await _db.SaveChangesAsync();
+            var groupusers = new List<GroupUser>();
+            foreach(var a in users)
+            {
+                groupusers.Add(new GroupUser()
+                {
+                    GroupId=group.Id,
+                    UserId=a,
+                    Isjoined=true,
+                });
+            }
+            await _db.GroupUsers.AddRangeAsync(groupusers);
+            await _db.SaveChangesAsync();
+            group.GroupUsers = groupusers;
             return group;
         }
 

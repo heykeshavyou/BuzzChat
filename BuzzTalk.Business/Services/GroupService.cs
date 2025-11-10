@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BuzzTalk.Business.Dtos;
+using BuzzTalk.Data.Entities;
 using BuzzTalk.Data.Repositories;
 
 namespace BuzzTalk.Business.Services
@@ -8,6 +9,7 @@ namespace BuzzTalk.Business.Services
     {
         Task<List<GroupDto>> GetAllGroup(int id);
         Task<GroupDto> GetGroup(int id);
+        Task<GroupDto> Create(GroupDto group,List<int> users);
     }
     public class GroupService : IGroupService
     {
@@ -18,6 +20,12 @@ namespace BuzzTalk.Business.Services
         {
             _groupRepository = groupRepository;
             _mapper = mapper;
+        }
+
+        public async Task<GroupDto> Create(GroupDto group, List<int> users)
+        {
+            var res = await _groupRepository.CreateGroup(_mapper.Map<Group>(group),users);
+            return _mapper.Map<GroupDto>(res);
         }
 
         public async Task<List<GroupDto>> GetAllGroup(int id)

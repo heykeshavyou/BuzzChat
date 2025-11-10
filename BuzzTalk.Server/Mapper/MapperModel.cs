@@ -16,6 +16,7 @@ namespace BuzzTalk.Server.Mapper
             CreateMap<UserModel, UserModelHub>();
             CreateMap<MessageHub,MessageDto>().ReverseMap();
             CreateMap<GroupModel, GroupDto>().ReverseMap();
+            CreateMap<GroupUserModel, GroupUserDto>().ReverseMap();
         }
     }
 }
