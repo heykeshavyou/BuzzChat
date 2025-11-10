@@ -49,6 +49,15 @@ export class ChatService {
       .start()
       .then(() => {
         this._hubConnection?.invoke('ConnectUser', model);
+        this._hubConnection
+          ?.invoke('GetGroups')
+          .then((res) => {
+            this.zone.run(() => {
+              this.Groups = res;
+              this.messagesChanged$.next();
+            });
+          })
+          .catch((error) => {});
       })
       .catch((error) => {
         console.log(error);
@@ -63,6 +72,7 @@ export class ChatService {
       }
     }
   }
+
   CreateNewChat(id: number) {
     let group = this.FindUserGroup(id);
     if (group == null) {
@@ -82,17 +92,22 @@ export class ChatService {
     }
   }
   SendMessage(message: Message) {
-    this._hubConnection?.invoke('SendMessage', message).then((res) => {
-      this.zone.run(() => {
-        if (message.groupId == null) {
-          this.GetGroupById(res.groupId);
-        }
-        let index = this.Groups.findIndex((x) => x.id == res.groupId);
-        this.Groups[index].messages?.push(res);
-        this.CurrentGroup = this.Groups[index];
-        this.messagesChanged$.next();
+    this._hubConnection
+      ?.invoke('SendMessage', message)
+      .then((res) => {
+        this.zone.run(() => {
+          if (message.groupId == null) {
+            this.GetGroupById(res.groupId);
+          }
+          let index = this.Groups.findIndex((x) => x.id == res.groupId);
+          this.Groups[index].messages?.push(res);
+          this.CurrentGroup = this.Groups[index];
+          this.messagesChanged$.next();
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-    });
   }
   GetCurrentGroupUser(): UserHub | undefined {
     const users = this.CurrentGroup?.users;
@@ -132,12 +147,12 @@ export class ChatService {
     this._hubConnection?.on('NewMessageReceive', (message: Message) => {
       this.zone.run(() => {
         let index = this.Groups.findIndex((x) => x.id == message.groupId);
+
         if (index != -1) {
           if (
-            this.Groups[index].messages?.findIndex((x) => x.id != message.id) ==
+            this.Groups[index].messages?.findIndex((x) => x.id == message.id) ==
             -1
           ) {
-            console.log(message);
             this.Groups[index].messages?.push(message);
             if (
               this.CurrentGroup?.id == message.groupId &&
@@ -181,7 +196,7 @@ export class ChatService {
   NewGroupCreated() {
     this._hubConnection?.on('NewGroupCreated', (group: Group) => {
       this.zone.run(() => {
-        group.messages=[];
+        group.messages = [];
         this.Groups.push(group);
         this.messagesChanged$.next();
       });

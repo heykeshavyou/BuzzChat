@@ -3,6 +3,7 @@ import { UserService } from '../../Services/User/user-service';
 import { Router, RouterOutlet, RouterLinkWithHref } from '@angular/router';
 import { ChatService } from '../../Services/Chat/chat-service';
 import { Chat } from '../chat/chat';
+import { ApiService } from '../../Services/Api/api-service';
 
 @Component({
   selector: 'app-home',
@@ -15,11 +16,15 @@ export class Home implements OnInit {
   constructor(
     private _userService: UserService,
     private _router: Router,
-    public _chatService: ChatService
+    private _chatService: ChatService,
+    private _apiService: ApiService
   ) {
     this.initialInnerWidth = window.innerWidth;
   }
   ngOnInit(): void {
+    if (this._chatService.Users.length == 0) {
+      this.GetUsers();
+    }
     if (this._userService.user == null) {
       this._router.navigate(['/login']);
     } else {
@@ -39,5 +44,14 @@ export class Home implements OnInit {
   @HostListener('document:keydown.escape', ['$event'])
   onEscape(event: Event) {
     this._chatService.CurrentGroup = null;
+  }
+  GetUsers() {
+    this._apiService.GetUsers(this._userService.user?.token ?? '').subscribe(
+      (res) => {
+        this._chatService.Users = res;
+      },
+      (error) => {},
+      () => {}
+    );
   }
 }

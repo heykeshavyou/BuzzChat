@@ -1,0 +1,33 @@
+<div class="p-3">
+  <h1 class="text-center text-2xl font-medium my-2">Create Group</h1>
+  <div class="items-center flex flex-col my-2">
+    <div class="size-20 bg-gray-300 flex cursor-pointer justify-center items-center rounded-full ">
+        <img src="/camera.svg" width="40"/>
+    </div>
+    <p class="text-[14px] cursor-pointer my-1">Add Group Icon</p>
+  </div>
+  <div>
+    <input  class="border-black border-2 rounded-[5px] py-2 px-2 w-full placeholder-gray-500" [placeholder]="['Name']"/>
+  </div>
+      <h1 class="my-2">Select Group members</h1>
+
+  <div class="overflow-y-scroll h-60">
+    @for (item of ChatService.Users; track $index) {
+        <div class="my-1 p-2 person flex gap-x-2.5 items-center">
+            <input type="checkbox" class="w-5 h-5"/>
+          <div>
+            <img
+              src="/16.png"
+              height="50"
+              width="50"
+              class="aspect-square object-contain"
+            />
+          </div>
+          <div class="py-2">
+            <p class="capitalize">{{ item.name }}</p>
+          </div>
+        </div>
+    }
+  </div>
+  <button class="btn my-4 p-3 w-full" >Create</button>
+</div>

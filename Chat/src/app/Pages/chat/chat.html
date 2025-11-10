@@ -5,12 +5,17 @@
       <div class="flex items-center gap-2.5">
         <div>
           <img
-            src="/16.png"
-            height="40"
-            width="40"
-            class="aspect-square object-contain"
+            [src]="[
+              ChatService.CurrentGroup.icon != null && ChatService.CurrentGroup.icon != ''
+                ? 'https://localhost:7059/' + ChatService.CurrentGroup.icon
+                : '/16.png'
+            ]"
+            height="50"
+            width="50"
+            class="aspect-square object-contain rounded-full"
           />
         </div>
+
         <div>
           <p class="capitalize font-medium">
             {{
@@ -25,22 +30,27 @@
   </div>
 
   <div class="flex flex-col row-span-12 justify-end p-3">
-    <div class="overflow-y-scroll h-[68vh] messages" #chatContainer>
+    <div class="overflow-y-scroll h-[67vh] messages" #chatContainer>
       @for (item of ChatService.CurrentGroup.messages; track $index) {
       <div
         class="flex my-1"
         [ngClass]="[item.fromId == User?.id ? 'justify-end' : 'justify-start']"
       >
-        <div class="w-1/2 flex" [ngClass]="[item.fromId == User?.id ? 'justify-end' : 'justify-start']">
+        <div
+          class="w-1/2 flex"
+          [ngClass]="[
+            item.fromId == User?.id ? 'justify-end' : 'justify-start'
+          ]"
+        >
           <div
-            class="bg-white  text-[16px] gap-2 px-2 py-1 rounded-[5px] flex items-center"
+            class="bg-white text-[16px] gap-2 px-2 py-1 rounded-[5px] flex items-center"
           >
             <p class="break-all">
               {{ item.content }}
             </p>
 
             <div class="flex items-end h-full">
-              <p class="text-gray-400 text-[10px] ">
+              <p class="text-gray-400 text-[10px]">
                 {{ item.sentOn | date : "h:mm a" }}
               </p>
             </div>
@@ -74,7 +84,7 @@
 </div>
 
 }@else{
-  <div class="h-full flex justify-center items-center">
-    <p class=" text-3xl">Hey 👋, {{User?.name}} 😊</p>
-  </div>
+<div class="h-full flex justify-center items-center">
+  <p class="text-3xl">Hey 👋, {{ User?.name }} 😊</p>
+</div>
 }
