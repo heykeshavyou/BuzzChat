@@ -62,13 +62,13 @@ namespace BuzzTalk.Server.Controllers
                 throw ex;
             }
         }
-        [AllowAnonymous]
         [HttpPost("Create")]
         public async Task<IActionResult> CreateGroup([FromForm] CreateGroupModel model)
         {
             try
             {
                 var id = int.Parse(this.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                model.users.Add(id);
                 string path = null;
                 if (model.icon.Length > 0)
                 {
@@ -101,13 +101,14 @@ namespace BuzzTalk.Server.Controllers
                         if (connectedUser.Value != null && user.Id != id)
                         {
                             await _hubContext.Clients.Client(connectedUser.Value.ConnectionId).NewGroupCreated(groupModel);
+                            await _hubContext.Groups.AddToGroupAsync(connectedUser.Value.ConnectionId, groupModel.Guid);
                         }
                     }
                 }
                 return Ok(groupModel);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) { 
+            
                 throw ex;
             }
         }

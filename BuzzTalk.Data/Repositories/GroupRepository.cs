@@ -6,8 +6,8 @@ namespace BuzzTalk.Data.Repositories
 {
     public interface IGroupRepository
     {
-        Task<Group> CreateGroup(Group group,List<int> users);
-        Task<Group> CreateOneToOneChat(int toId , int fromId);
+        Task<Group> CreateGroup(Group group, List<int> users);
+        Task<Group> CreateOneToOneChat(int toId, int fromId);
         Task<List<Group>> GetAllGroups(int userId);
         Task<Group> GetGroupById(int id);
 
@@ -28,24 +28,23 @@ namespace BuzzTalk.Data.Repositories
             await _db.Groups.AddAsync(group);
             await _db.SaveChangesAsync();
             var groupusers = new List<GroupUser>();
-            foreach(var a in users)
+            foreach (var a in users)
             {
                 groupusers.Add(new GroupUser()
                 {
-                    GroupId=group.Id,
-                    UserId=a,
-                    Isjoined=true,
+                    GroupId = group.Id,
+                    UserId = a,
+                    Isjoined = true,
                 });
             }
             await _db.GroupUsers.AddRangeAsync(groupusers);
             await _db.SaveChangesAsync();
-            group.GroupUsers = groupusers;
-            return group;
+            return await GetGroupById(group.Id);
         }
 
         public async Task<Group> CreateOneToOneChat(int toId, int fromId)
         {
-            var user1 = await _db.Users.FirstOrDefaultAsync(x => x.Id ==fromId );
+            var user1 = await _db.Users.FirstOrDefaultAsync(x => x.Id == fromId);
             if (user1 is null) return null;
             var user2 = await _db.Users.FirstOrDefaultAsync(x => x.Id == toId);
             if (user2 is null) return null;
@@ -57,7 +56,7 @@ namespace BuzzTalk.Data.Repositories
                 CreatedTime = DateTime.Now,
                 Icon = ""
             };
-            
+
             await _db.Groups.AddAsync(group);
             await _db.SaveChangesAsync();
             var newGroupUser = new List<GroupUser>()
@@ -73,11 +72,11 @@ namespace BuzzTalk.Data.Repositories
                     UserId = user1.Id,
                     GroupId = group.Id,
                     Isjoined=true
-                },    
+                },
             };
             await _db.GroupUsers.AddRangeAsync(newGroupUser);
             await _db.SaveChangesAsync();
-            group.GroupUsers=newGroupUser;
+            group.GroupUsers = newGroupUser;
             return group;
         }
 
@@ -87,27 +86,31 @@ namespace BuzzTalk.Data.Repositories
                 .Include(x => x.Group)
                 .ThenInclude(x => x.GroupUsers)
                 .ThenInclude(x => x.User)
-                .Include(x=>x.Group.Messages)
+                .Include(x => x.Group.Messages)
                 .Where(x => x.UserId == userId && x.Isjoined == true)
                 .Select(x => x.Group)
-                .ToListAsync();      
+                .OrderByDescending(g => g.Messages
+                .OrderByDescending(m => m.SentOn)
+                .Select(m => m.SentOn)
+                .FirstOrDefault())
+                .ToListAsync();
             return groups;
         }
 
         public async Task<Group> GetGroupById(int id)
         {
             var group = await _db.Groups
-                .Include(x=>x.GroupUsers)
-                .ThenInclude(x=>x.User)
+                .Include(x => x.GroupUsers)
+                .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id);
             return group;
         }
 
         private string GuidGenerator()
         {
-            Guid newGuid=Guid.NewGuid();
+            Guid newGuid = Guid.NewGuid();
             return $"{newGuid}";
         }
- 
+
     }
 }
