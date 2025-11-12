@@ -1,20 +1,55 @@
 <div class="p-3">
   <h1 class="text-center text-2xl font-medium my-2">Create Group</h1>
-  <div class="items-center flex flex-col my-2">
-    <div class="size-20 bg-gray-300 flex cursor-pointer justify-center items-center rounded-full ">
-        <img src="/camera.svg" width="40"/>
+  <form [formGroup]="groupForm" (submit)="Create($event)">
+    <div class="items-center flex flex-col my-4">
+      @if(!Loading()){ @if(!imagePreview){
+      <div
+        class="size-20 bg-gray-300 flex cursor-pointer justify-center items-center rounded-full"
+        (click)="fileInput.click()"
+      >
+        <img src="/camera.svg" width="40" />
+      </div>
+      <p class="text-[14px] cursor-pointer my-1">Add Group Icon</p>
+      <input
+        hidden
+        #fileInput
+        (change)="onFileSelected($event)"
+        type="file"
+        accept="image/*"
+      />
+      }@else {
+      <div
+        class="flex flex-col cursor-pointer justify-center gap-1 items-center rounded-full"
+      >
+        <img [src]="imagePreview" class="size-20 rounded-full aspect-square object-cover" />
+        <p class="text-red-600 text-[14px]" (click)="imagePreview=''">Remove image</p>
+      </div>
+      } }
     </div>
-    <p class="text-[14px] cursor-pointer my-1">Add Group Icon</p>
-  </div>
-  <div>
-    <input  class="border-black border-2 rounded-[5px] py-2 px-2 w-full placeholder-gray-500" [placeholder]="['Name']"/>
-  </div>
-      <h1 class="my-2">Select Group members</h1>
 
-  <div class="overflow-y-scroll h-60">
-    @for (item of ChatService.Users; track $index) {
-        <div class="my-1 p-2 person flex gap-x-2.5 items-center">
-            <input type="checkbox" class="w-5 h-5"/>
+    <div class="my-4">
+      <input
+        class="border-black border-2 rounded-[5px] py-2 px-2 w-full placeholder-gray-500"
+        [placeholder]="['Name']"
+        formControlName="Name"
+      />
+    </div>
+    <h1 class="my-2">Select Group members</h1>
+
+    <div class="overflow-y-scroll h-60">
+      @for (item of ChatService.Users; track $index) {
+      <div class="my-1 p-2 person flex gap-x-2.5 items-center">
+        <input
+          type="checkbox"
+          class="w-5 h-5"
+          [id]="item.username"
+          (change)="onCheckBoxClick($event)"
+          [value]="item.id"
+        />
+        <label
+          class="flex items-center gap-2.5 cursor-pointer w-full"
+          [for]="item.username"
+        >
           <div>
             <img
               src="/16.png"
@@ -26,8 +61,10 @@
           <div class="py-2">
             <p class="capitalize">{{ item.name }}</p>
           </div>
-        </div>
-    }
-  </div>
-  <button class="btn my-4 p-3 w-full" >Create</button>
+        </label>
+      </div>
+      }
+    </div>
+    <button class="btn my-4 p-3 w-full">Create</button>
+  </form>
 </div>

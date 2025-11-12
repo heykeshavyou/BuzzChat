@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import Group from '../../Models/Group';
 import Message from '../../Models/Message';
 import { ApiService } from '../Api/api-service';
-import { Subject } from 'rxjs';
+import { find, Subject } from 'rxjs';
 import User from '../../Models/User';
 
 @Injectable({
@@ -102,6 +102,7 @@ export class ChatService {
           let index = this.Groups.findIndex((x) => x.id == res.groupId);
           this.Groups[index].messages?.push(res);
           this.CurrentGroup = this.Groups[index];
+          this.Sorted(res.groupId);
           this.messagesChanged$.next();
         });
       })
@@ -162,6 +163,7 @@ export class ChatService {
             }
           }
         }
+        this.Sorted(message.groupId??0);
         this.messagesChanged$.next();
       });
     });
@@ -225,5 +227,16 @@ export class ChatService {
       return user[0] ?? null;
     }
     return null;
+  }
+  GetUserName(id:number){
+   let user=  this.Users.find(x=>x.id==id);
+   return user?.name;
+  }
+  Sorted(id:number){
+    let group= this.Groups.find(x=>x.id==id);
+    if(!group)return;
+    let groupIndex= this.Groups.findIndex(x=>x.id==id);
+    this.Groups.splice(groupIndex,1);
+    this.Groups.splice(0,0,group);
   }
 }

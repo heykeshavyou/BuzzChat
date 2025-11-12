@@ -6,7 +6,8 @@
         <div>
           <img
             [src]="[
-              ChatService.CurrentGroup.icon != null && ChatService.CurrentGroup.icon != ''
+              ChatService.CurrentGroup.icon != null &&
+              ChatService.CurrentGroup.icon != ''
                 ? 'https://localhost:7059/' + ChatService.CurrentGroup.icon
                 : '/16.png'
             ]"
@@ -42,17 +43,20 @@
             item.fromId == User?.id ? 'justify-end' : 'justify-start'
           ]"
         >
-          <div
-            class="bg-white text-[16px] gap-2 px-2 py-1 rounded-[5px] flex items-center"
-          >
-            <p class="break-all">
-              {{ item.content }}
-            </p>
-
-            <div class="flex items-end h-full">
-              <p class="text-gray-400 text-[10px]">
-                {{ item.sentOn | date : "h:mm a" }}
+          <div class="bg-white text-[16px]  px-2 py-1 rounded-[5px] ">
+            @if( item.fromId != User?.id &&ChatService.CurrentGroup.name!=null){
+            <p class="capitalize text-amber-300 text-[14px]">{{ ChatService.GetUserName(item.fromId ?? 0) }}</p>
+            }
+            <div class="flex items-end  justify-between gap-2">
+              <p class="break-all">
+                {{ item.content }}
               </p>
+
+              <div class="flex items-end h-full">
+                <p class="text-gray-400 text-[10px]">
+                  {{ item.sentOn | date : "h:mm a" }}
+                </p>
+              </div>
             </div>
           </div>
         </div>

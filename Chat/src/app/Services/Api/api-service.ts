@@ -47,4 +47,13 @@ export class ApiService {
       headers,
     });
   }
+  CreateGroup(model: any, token: string): Observable<Group> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      
+    });
+    return this._httpClient.post<Group>(`${this.baseUrl}Group/Create`, model, {
+      headers,
+    });
+  }
 }
