@@ -7,11 +7,17 @@
     @apply scale-105;
 }
 .link{
-  @apply cursor-pointer w-[50px] h-[50px] rounded-[50%] transition-all duration-200 flex justify-center items-center hover:bg-gray-300;
+  @apply cursor-pointer  p-2 rounded-[50%] transition-all duration-200 flex justify-center items-center hover:bg-gray-200;
 }
 .person{
   @apply cursor-pointer  hover:bg-gray-300 transition-all duration-200 rounded-[10px];
 }
 .messages::-webkit-scrollbar {
   display: none;
+}
+.boxshadow{
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+button{
+  @apply cursor-pointer;
 }

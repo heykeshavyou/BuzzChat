@@ -1,4 +1,4 @@
-<div class="p-3">
+<div class="">
   @if(Loading()){
   <div class="flex justify-center pt-40">
     <Loading [IsBlack]="true" width="100px" />
@@ -6,19 +6,23 @@
   }@else {
   <div>
     @for (item of ChatService.Users; track $index) {
-    <div>
+    <div class="mx-2.5 h-[77px]">
       <button class="w-full" (click)="ChatService.CreateNewChat(item.id)">
         <div class="my-1 p-2 person flex gap-x-2.5">
-          <div>
+          <div class="flex justify-center items-center relative">
             <img
               src="/16.png"
               height="50"
               width="50"
-              class="aspect-square object-contain"
+              class="aspect-square object-contain rounded-full"
             />
           </div>
-          <div class="py-2">
-            <p class="capitalize">{{ item.name }}</p>
+          <div class="py-1 w-full">
+            <div class="flex justify-between">
+              <p class="capitalize text-start">
+                {{ item.name }}
+              </p>
+            </div>
           </div>
         </div>
       </button>

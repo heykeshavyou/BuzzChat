@@ -38,6 +38,7 @@ export class LoginApp implements OnInit {
     let model: Login = {
       username: this.Username.value,
       password: this.Password.value,
+      token :this._userService.Token
     };
     this._apiService.Login(model).subscribe(
       (res) => {

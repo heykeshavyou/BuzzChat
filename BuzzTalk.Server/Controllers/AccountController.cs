@@ -51,7 +51,7 @@ namespace BuzzTalk.Server.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
-            var result = await _accountService.Login( login.username,login.password);
+            var result = await _accountService.Login( login.username,login.password,login.token);
             var user = _mapper.Map<UserModel>(result);
             user.Token = GenerateToken(user);
             if (result != null)
@@ -92,6 +92,5 @@ namespace BuzzTalk.Server.Controllers
             }
             return NotFound("No users found");
         }
-
     }
 }

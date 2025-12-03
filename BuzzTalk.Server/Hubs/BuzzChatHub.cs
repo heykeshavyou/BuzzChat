@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using BuzzTalk.Business.Dtos;
 using BuzzTalk.Business.Services;
-using BuzzTalk.Data.Entities;
 using BuzzTalk.Server.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace BuzzTalk.Server.Hubs
 {
@@ -28,16 +24,20 @@ namespace BuzzTalk.Server.Hubs
     public class BuzzChatHub : Hub<IbuzzChatHub>
     {
         public static readonly IDictionary<int, UserModelHub> _connectedUsers = new Dictionary<int, UserModelHub>();
+        public static readonly List<int> _connectedUserId = new List<int>();
         public static readonly IDictionary<int, string> _activeGroups = new Dictionary<int, string>();
         private readonly IMessageService _messageService;
+        private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
         private readonly IGroupService _groupService;
 
-        public BuzzChatHub(IMessageService messageService, IMapper mapper, IGroupService groupService)
+
+        public BuzzChatHub(IMessageService messageService, IMapper mapper, IGroupService groupService,INotificationService notificationService)
         {
             _messageService = messageService;
             _mapper = mapper;
             _groupService = groupService;
+            _notificationService = notificationService;
         }
         public override Task OnConnectedAsync()
         {
@@ -46,13 +46,14 @@ namespace BuzzTalk.Server.Hubs
             return base.OnConnectedAsync();
         }
         public async Task ConnectUser(UserModelHub user)
-        {
+            {
             await Clients.Caller.ConnectedUsers(_connectedUsers.Values.Where(x => x.Id != user.Id).ToList());
             if (!_connectedUsers.ContainsKey(user.Id))
             {
                 user.ConnectionId = Context.ConnectionId;
                 _connectedUsers.ContainsKey(user.Id);
                 _connectedUsers.Add(user.Id, user);
+                _connectedUserId.Add(user.Id);
             }
             await Clients.Others.UserConnected(user);
         }
@@ -91,6 +92,7 @@ namespace BuzzTalk.Server.Hubs
             if (_connectedUsers.ContainsKey(userId))
             {
                 _connectedUsers.Remove(userId);
+                _connectedUserId.Remove(userId);
             }
             var userModel = new UserModelHub
             {
@@ -108,7 +110,7 @@ namespace BuzzTalk.Server.Hubs
             var messageModel = _mapper.Map<MessageDto>(message);
             var res = await _messageService.SendMessage(messageModel);
             var Receiver = _connectedUsers.FirstOrDefault(x => x.Key == message.ToId).Value;
-
+            var title = "";
             if (res.Item3.GroupId != messageModel.GroupId)
             {
                 var group = await _groupService.GetGroup(res.Item3.GroupId ?? 0);
@@ -119,17 +121,38 @@ namespace BuzzTalk.Server.Hubs
             }
 
             message = _mapper.Map<MessageHub>(res.Item3);
-            if (_activeGroups.ContainsKey(message.GroupId??0))
+            if (_activeGroups.ContainsKey((int)message.GroupId))
             {
+                title =await GetNotificationTitle(userId,message.GroupId);
                 await Clients.OthersInGroup(_activeGroups.FirstOrDefault(x=>x.Key==message.GroupId).Value).NewMessageReceive(message);
             }
             else if(Receiver != null)
             {
+                title = await GetNotificationTitle(userId);
                 await Clients.Client(Receiver.ConnectionId).NewMessageReceive(message);
             }
-    
+            var notification = new NotificationDto()
+            {
+                GroupId = (int)message.GroupId,
+                Description = message.Content,
+                Title = title,
+                UserId= userId,
+            };
+            await _notificationService.SendMessage(notification,_connectedUserId);
             return message;
         }
+        private async Task<string> GetNotificationTitle(int userId, int? groupId)
+        {
+            var group =await _groupService.GetGroup((int)groupId);
+            var sender = _connectedUsers.FirstOrDefault(x => x.Key == userId).Value;
+            return $"{group.Name} : {sender.Name}";
+        }
+        private async Task<string> GetNotificationTitle(int userId)
+        {
+            var sender = _connectedUsers.FirstOrDefault(x => x.Key == userId).Value;
+            return $"{sender.Name}";
+        }
+
         //public async Task<List<MessageHub>> MarkRead(MessageHub getmessage)
         //{
         //    var messages = await _messageService.MarkRead(getmessage.FromId, getmessage.ToId);

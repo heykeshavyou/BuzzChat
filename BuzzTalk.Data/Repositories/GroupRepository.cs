@@ -10,6 +10,8 @@ namespace BuzzTalk.Data.Repositories
         Task<Group> CreateOneToOneChat(int toId, int fromId);
         Task<List<Group>> GetAllGroups(int userId);
         Task<Group> GetGroupById(int id);
+        Task<List<(int Id, string Token)>> GetGroupAllUserToken(int id, int userId);
+
 
     }
 
@@ -97,6 +99,20 @@ namespace BuzzTalk.Data.Repositories
             return groups;
         }
 
+        public async Task<List<(int Id,string Token)>> GetGroupAllUserToken(int id, int userId)
+        {
+            var tokens = await _db.GroupUsers
+                .Include(x => x.User)
+                .Where(x => x.GroupId == id && x.UserId != userId)
+                .Select(x => new ValueTuple<int,string>
+                (
+                     x.User.Id,
+                    x.User.Fcm
+                ))
+                .ToListAsync();
+            return tokens;
+        }
+
         public async Task<Group> GetGroupById(int id)
         {
             var group = await _db.Groups
@@ -111,6 +127,5 @@ namespace BuzzTalk.Data.Repositories
             Guid newGuid = Guid.NewGuid();
             return $"{newGuid}";
         }
-
     }
 }

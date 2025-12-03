@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { UserService } from '../../Services/User/user-service';
 import { Router, RouterOutlet, RouterLinkWithHref } from '@angular/router';
 import { ChatService } from '../../Services/Chat/chat-service';
@@ -11,7 +11,7 @@ import { ApiService } from '../../Services/Api/api-service';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   initialInnerWidth: number;
   constructor(
     private _userService: UserService,
@@ -53,5 +53,8 @@ export class Home implements OnInit {
       (error) => {},
       () => {}
     );
+  }
+  ngOnDestroy(): void {
+    this._chatService.Disconnect();
   }
 }

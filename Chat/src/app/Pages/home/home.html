@@ -1,11 +1,11 @@
-<div class="xl:h-screen xl:p-10">
-  <div class="xl:rounded-2xl xl:h-full xl:shadow-2xl xl:border border-gray-200">
-    <div class="grid xl:grid-cols-20 h-full grid-cols-1">
+<div class="xl:h-screen">
+  <div class="xl:h-full ">
+    <div class="grid xl:grid-cols-21 h-full grid-cols-1">
       @if(initialInnerWidth>1279){
       <div class="col-span-14 order-3 h-full">
         <app-chat />
       </div>
-      <div class="col-span-1 border-r order-1 border-gray-300 bg-gray-50 rounded-l-2xl">
+      <div class="col-span-1 border-r order-1 border-gray-300 bg-[#F7F5F3] ">
         <div class="py-3 grid grid-rows-2 h-full">
           <div class="flex items-start justify-center">
             <a routerLink="">
@@ -31,7 +31,7 @@
       </div>
       }
 
-      <div class="col-span-5 order-2 border-r border-gray-300 h-full">
+      <div class="col-span-6 order-2 border-r border-gray-300 h-full">
         <router-outlet> </router-outlet>
       </div>
     </div>

@@ -89,6 +89,7 @@ public partial class BuzzTalkContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07C0A2DEF1");
 
+            entity.Property(e => e.Fcm).HasColumnName("FCM");
             entity.Property(e => e.JoinedOn).HasColumnType("datetime");
         });
 

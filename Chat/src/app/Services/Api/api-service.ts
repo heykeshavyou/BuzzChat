@@ -14,7 +14,7 @@ export class ApiService {
   private isLocal = true;
   private baseUrl = this.isLocal
     ? 'https://localhost:7059/api/'
-    : 'http://192.168.1.35:5500/api/';
+    : 'http://192.168.1.36/api/';
   constructor(private _httpClient: HttpClient) {}
   Login(model: Login): Observable<User> {
     return this._httpClient.post<User>(`${this.baseUrl}Account/Login`, model);
@@ -56,4 +56,5 @@ export class ApiService {
       headers,
     });
   }
+
 }

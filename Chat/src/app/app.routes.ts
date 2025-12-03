@@ -13,7 +13,6 @@ export const routes: Routes = [
         {path :'',component:Chatlist},
         {path :'profile',component:Profile},
         {path:'chat',component:Chat},
-        {path:'all',component:AllUsers},
         {path:'creategroup',component:CreateGroup}
     ]},
     {path:"login",component:LoginApp},

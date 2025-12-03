@@ -17,7 +17,7 @@ export class ChatService {
   private isLocal = true;
   private baseUrl = this.isLocal
     ? 'https://localhost:7059/'
-    : 'http://192.168.1.35:5500/';
+    : 'http://192.168.1.36/';
   Users: UserHub[] = [];
   Groups: Group[] = [];
   CurrentGroup: Group | null = null;
@@ -38,6 +38,7 @@ export class ChatService {
         },
       })
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Debug)
       .build();
     let model = {
       Id: this._userService.user?.id,
@@ -126,7 +127,9 @@ export class ChatService {
     return '';
   }
   FindUserGroup(id: number): Group | null {
-    let group = this.Groups.find((x) => x.users?.find((y) => y.id == id));
+    let group = this.Groups.find(
+      (x) => x.users?.find((y) => y.id == id) && x.users.length == 2
+    );
     let users = group?.users?.filter((x) => x.id != this._userService.user?.id);
     if (users?.length == 1) {
       return group ?? null;
@@ -163,7 +166,7 @@ export class ChatService {
             }
           }
         }
-        this.Sorted(message.groupId??0);
+        this.Sorted(message.groupId ?? 0);
         this.messagesChanged$.next();
       });
     });
@@ -228,15 +231,23 @@ export class ChatService {
     }
     return null;
   }
-  GetUserName(id:number){
-   let user=  this.Users.find(x=>x.id==id);
-   return user?.name;
+  GetUserName(id: number) {
+    let user = this.Users.find((x) => x.id == id);
+    return user?.name;
   }
-  Sorted(id:number){
-    let group= this.Groups.find(x=>x.id==id);
-    if(!group)return;
-    let groupIndex= this.Groups.findIndex(x=>x.id==id);
-    this.Groups.splice(groupIndex,1);
-    this.Groups.splice(0,0,group);
+  Sorted(id: number) {
+    let group = this.Groups.find((x) => x.id == id);
+    if (!group) return;
+    let groupIndex = this.Groups.findIndex((x) => x.id == id);
+    this.Groups.splice(groupIndex, 1);
+    this.Groups.splice(0, 0, group);
+  }
+  Disconnect() {
+    if (
+      this._hubConnection &&
+      this._hubConnection.state === signalR.HubConnectionState.Connected
+    ) {
+      this._hubConnection?.stop();
+    }
   }
 }

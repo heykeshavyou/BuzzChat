@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import User from '../../Models/User';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
   user: User | null = null;
-  constructor() {
+  Token:string="";
+  constructor(private _router:Router) {
     this.GetUser();
   }
   SaveUser(newUser: User) {
@@ -18,5 +20,10 @@ export class UserService {
     let data = localStorage.getItem('chatUser') ?? '';
     let user: User = data ? JSON.parse(data) : null;
     this.user = user;
+  }
+  Logout(){
+    localStorage.removeItem('chatUser');
+    this.user=null;
+    this._router.navigate(['/login']);
   }
 }

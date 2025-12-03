@@ -33,7 +33,6 @@ export class AllUsers implements OnInit {
         this.ChatService.Users = res;
       },
       (error) => {
-        console.log(error);
       },
       () => {
         this.Loading.set(false);

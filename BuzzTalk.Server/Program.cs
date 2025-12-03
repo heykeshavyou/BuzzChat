@@ -5,6 +5,8 @@ using BuzzTalk.Data.Entities;
 using BuzzTalk.Data.Repositories;
 using BuzzTalk.Server.Hubs;
 using BuzzTalk.Server.Mapper;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -78,7 +80,7 @@ builder.Services.AddSwaggerGen(options =>
         }
 
     });
-    
+
 });
 
 builder.Services.AddCors(options =>
@@ -101,11 +103,16 @@ builder.Services
     .AddTransient<IAccountRepository, AccountRepository>()
     .AddTransient<IMessageRepository, MessageRepository>()
     .AddTransient<IGroupRepository, GroupRepository>()
-    .AddTransient<IGroupService,GroupService>();
+    .AddTransient<IGroupService, GroupService>()
+    .AddTransient<INotificationService,NotificationService>();
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("FireChat.json")
+});
 var app = builder.Build();
 app.UseStaticFiles();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 

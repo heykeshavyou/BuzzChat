@@ -9,14 +9,15 @@ namespace BuzzTalk.Business.Services
     {
         Task<List<GroupDto>> GetAllGroup(int id);
         Task<GroupDto> GetGroup(int id);
-        Task<GroupDto> Create(GroupDto group,List<int> users);
+        Task<GroupDto> Create(GroupDto group, List<int> users);
+        Task<List<(int, string)>> GetGroupAllUserToken(int id, int userId);
     }
     public class GroupService : IGroupService
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
 
-        public GroupService(IGroupRepository groupRepository,IMapper mapper)
+        public GroupService(IGroupRepository groupRepository, IMapper mapper)
         {
             _groupRepository = groupRepository;
             _mapper = mapper;
@@ -24,7 +25,7 @@ namespace BuzzTalk.Business.Services
 
         public async Task<GroupDto> Create(GroupDto group, List<int> users)
         {
-            var res = await _groupRepository.CreateGroup(_mapper.Map<Group>(group),users);
+            var res = await _groupRepository.CreateGroup(_mapper.Map<Group>(group), users);
             return _mapper.Map<GroupDto>(res);
         }
 
@@ -32,9 +33,10 @@ namespace BuzzTalk.Business.Services
         {
             try
             {
-            var res = await _groupRepository.GetAllGroups(id);
-            return _mapper.Map<List<GroupDto>>(res);
-            }catch(Exception ex)
+                var res = await _groupRepository.GetAllGroups(id);
+                return _mapper.Map<List<GroupDto>>(res);
+            }
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -45,6 +47,12 @@ namespace BuzzTalk.Business.Services
         {
             var res = await _groupRepository.GetGroupById(id);
             return _mapper.Map<GroupDto>(res);
+        }
+
+        public async Task<List<(int, string)>> GetGroupAllUserToken(int id, int userId)
+        {
+            var tokens = await _groupRepository.GetGroupAllUserToken(id, userId);
+            return tokens;
         }
     }
 }

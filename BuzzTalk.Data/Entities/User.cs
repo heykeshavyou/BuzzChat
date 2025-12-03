@@ -17,6 +17,8 @@ public partial class User
 
     public DateTime? JoinedOn { get; set; }
 
+    public string? Fcm { get; set; }
+
     public virtual ICollection<GroupUser> GroupUsers { get; set; } = new List<GroupUser>();
 
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();

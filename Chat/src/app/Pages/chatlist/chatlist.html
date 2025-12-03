@@ -1,27 +1,106 @@
-<div class="px-3 relative h-full">
-  <div class="mt-3 flex justify-between items-center">
-    <h1 class="text-2xl font-medium">Chat</h1>
-    <div class="flex items-center">
+<div class="relative h-full">
+  <div class="flex justify-between items-center px-5 py-2.5">
+    <h1 class="text-2xl font-medium text-[#1d90aa]">BuzzChat</h1>
+    <div class="flex items-center gap-2.5">
       <a [routerLink]="['creategroup']" title="Create Group">
-              <div class="link">
-        <img src="/group.svg" width="30" height="30" />
-      </div>
+        <div class="link">
+          <svg
+            viewBox="0 0 24 24"
+            height="24"
+            width="24"
+            preserveAspectRatio="xMidYMid meet"
+            class=""
+            fill="none"
+          >
+            <title>Create Group</title>
+
+            <path
+              d="M9.53277 12.9911H11.5086V14.9671C11.5086 15.3999 11.7634 15.8175 12.1762 15.9488C12.8608 16.1661 13.4909 15.6613 13.4909 15.009V12.9911H15.4672C15.9005 12.9911 16.3181 12.7358 16.449 12.3226C16.6659 11.6381 16.1606 11.0089 15.5086 11.0089H13.4909V9.03332C13.4909 8.60007 13.2361 8.18252 12.8233 8.05119C12.1391 7.83391 11.5086 8.33872 11.5086 8.991V11.0089H9.49088C8.83941 11.0089 8.33411 11.6381 8.55097 12.3226C8.68144 12.7358 9.09947 12.9911 9.53277 12.9911Z"
+              fill="currentColor"
+            ></path>
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M0.944298 5.52617L2.99998 8.84848V17.3333C2.99998 18.8061 4.19389 20 5.66665 20H19.3333C20.8061 20 22 18.8061 22 17.3333V6.66667C22 5.19391 20.8061 4 19.3333 4H1.79468C1.01126 4 0.532088 4.85997 0.944298 5.52617ZM4.99998 8.27977V17.3333C4.99998 17.7015 5.29845 18 5.66665 18H19.3333C19.7015 18 20 17.7015 20 17.3333V6.66667C20 6.29848 19.7015 6 19.3333 6H3.58937L4.99998 8.27977Z"
+              fill="currentColor"
+            ></path>
+          </svg>
+        </div>
       </a>
 
       <div class="link">
-        <img src="/dot.svg" width="25" height="25" />
+        <button (click)="OpenMenu()">
+          <svg
+            viewBox="0 0 24 24"
+            height="24"
+            width="24"
+            preserveAspectRatio="xMidYMid meet"
+            class=""
+            fill="none"
+          >
+            <title>Menu</title>
+            <path
+              d="M12 20C11.45 20 10.9792 19.8042 10.5875 19.4125C10.1958 19.0208 10 18.55 10 18C10 17.45 10.1958 16.9792 10.5875 16.5875C10.9792 16.1958 11.45 16 12 16C12.55 16 13.0208 16.1958 13.4125 16.5875C13.8042 16.9792 14 17.45 14 18C14 18.55 13.8042 19.0208 13.4125 19.4125C13.0208 19.8042 12.55 20 12 20ZM12 14C11.45 14 10.9792 13.8042 10.5875 13.4125C10.1958 13.0208 10 12.55 10 12C10 11.45 10.1958 10.9792 10.5875 10.5875C10.9792 10.1958 11.45 10 12 10C12.55 10 13.0208 10.1958 13.4125 10.5875C13.8042 10.9792 14 11.45 14 12C14 12.55 13.8042 13.0208 13.4125 13.4125C13.0208 13.8042 12.55 14 12 14ZM12 8C11.45 8 10.9792 7.80417 10.5875 7.4125C10.1958 7.02083 10 6.55 10 6C10 5.45 10.1958 4.97917 10.5875 4.5875C10.9792 4.19583 11.45 4 12 4C12.55 4 13.0208 4.19583 13.4125 4.5875C13.8042 4.97917 14 5.45 14 6C14 6.55 13.8042 7.02083 13.4125 7.4125C13.0208 7.80417 12.55 8 12 8Z"
+              fill="currentColor"
+            ></path>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
+  <div
+    class="w-37.5 absolute right-0 xl:right-[-90px] bg-[#ffffff] p-2 boxshadow rounded-[5px]"
+    [ngClass]="MenuClass"
+  >
+    <button
+      class="w-full flex gap-1.5 text-start rounded-[5px] p-1 hover:text-rose-700 transition-all hover:bg-red-200"
+      (click)="Logout()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        height="24"
+        width="24"
+        preserveAspectRatio="xMidYMid meet"
+        class=""
+        fill="none"
+      >
+        <title>Logout</title>
+        <path
+          d="M5 21C4.45 21 3.97917 20.8042 3.5875 20.4125C3.19583 20.0208 3 19.55 3 19V5C3 4.45 3.19583 3.97917 3.5875 3.5875C3.97917 3.19583 4.45 3 5 3H11C11.5523 3 12 3.44772 12 4C12 4.55228 11.5523 5 11 5H5V19H11C11.5523 19 12 19.4477 12 20C12 20.5523 11.5523 21 11 21H5ZM16.7252 16.2748C16.3279 16.6721 15.681 16.6636 15.2943 16.2558C14.9218 15.863 14.93 15.245 15.3127 14.8623L17.175 13H10C9.44771 13 9 12.5523 9 12C9 11.4477 9.44772 11 10 11H17.175L15.3127 9.13775C14.93 8.755 14.9218 8.13701 15.2943 7.74424C15.681 7.33644 16.3279 7.32786 16.7252 7.72525L21 12L16.7252 16.2748Z"
+          fill="currentColor"
+        ></path>
+      </svg>
+      <span>Logout</span>
+    </button>
+  </div>
+  <div class="grid grid-cols-2 gap-2.5 px-5 my-2">
+    <button
+      (click)="Tab.set(true)"
+      class="rounded-[5px] px-2 py-1.5 font-semibold cursor-pointer"
+      [ngClass]="[Tab() ? 'bg-[#1d90aa] text-white' : 'bg-none text-black']"
+    >
+      All
+    </button>
+    <button
+      (click)="Tab.set(false)"
+      class="rounded-[5px] px-2 py-1.5 font-semibold cursor-pointer"
+      [ngClass]="[!Tab() ? 'bg-[#1d90aa] text-white' : 'bg-none text-black']"
+    >
+      Users
+    </button>
+  </div>
   <div>
-    @for (item of ChatService.Groups; track $index) {
-    <div>
+    @if(Tab()){ @for (item of ChatService.Groups; track $index) {
+    <div class="mx-2.5">
       <button class="w-full" (click)="ChatService.SetUser(item.id ?? 0)">
         <div class="my-1 p-2 person flex gap-x-2.5">
           <div class="flex justify-center items-center relative">
-
             <img
-              [src]="[(item.icon!=null&&item.icon!='')?'https://localhost:7059/'+item.icon:'/16.png']"
+              [src]="[
+                item.icon != null && item.icon != ''
+                  ? 'http://192.168.1.36/' + item.icon
+                  : '/16.png'
+              ]"
               height="50"
               width="50"
               class="aspect-square object-contain rounded-full"
@@ -68,13 +147,8 @@
         </div>
       </button>
     </div>
+    } }@else {
+    <app-all-users></app-all-users>
     }
-  </div>
-  <div
-    class="h-12 w-12 absolute bottom-[5%] right-[5%] flex justify-center items-center shadow-2xl bg-gray-300 rounded-full"
-  >
-    <a routerLink="all">
-      <img src="/messageplus.svg" width="30" />
-    </a>
   </div>
 </div>

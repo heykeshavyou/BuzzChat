@@ -1,5 +1,5 @@
 @if(ChatService.CurrentGroup!=null){
-<div class="grid grid-row-14 h-full bg-[#F3EFE8]">
+<div class="grid grid-row-14 h-full bg-[#F7F5F3]">
   <div class="row-span-2">
     <div class="border-b p-3 shadow-xs border-gray-300 bg-white">
       <div class="flex items-center gap-2.5">
@@ -8,7 +8,7 @@
             [src]="[
               ChatService.CurrentGroup.icon != null &&
               ChatService.CurrentGroup.icon != ''
-                ? 'https://localhost:7059/' + ChatService.CurrentGroup.icon
+                ? 'http://192.168.1.36/' + ChatService.CurrentGroup.icon
                 : '/16.png'
             ]"
             height="50"
@@ -31,7 +31,7 @@
   </div>
 
   <div class="flex flex-col row-span-12 justify-end p-3">
-    <div class="overflow-y-scroll h-[67vh] messages" #chatContainer>
+    <div class="overflow-y-scroll h-[75vh] messages" #chatContainer>
       @for (item of ChatService.CurrentGroup.messages; track $index) {
       <div
         class="flex my-1"
@@ -88,7 +88,7 @@
 </div>
 
 }@else{
-<div class="h-full flex justify-center items-center">
+<div class="h-full flex bg-[#F7F5F3] justify-center items-center">
   <p class="text-3xl">Hey 👋, {{ User?.name }} 😊</p>
 </div>
 }
