@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Firebase keys
+google-services.json
+GoogleService-Info.plist
+serviceAccountKey.json
+firebase-adminsdk.json
