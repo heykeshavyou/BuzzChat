@@ -73,8 +73,6 @@ export class ChatService {
       }
     }
   }
-
-x
   SendMessage(message: Message) {
     this._hubConnection
       ?.invoke('SendMessage', message)
