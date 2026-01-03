@@ -15,6 +15,7 @@ namespace BuzzTalk.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -29,6 +30,7 @@ namespace BuzzTalk.Server.Controllers
             _config = config;
            _hubContext = hubContext;
         }
+        [AllowAnonymous]
         [HttpPost("SignIn")]
         public async Task<IActionResult> Sign(SigninModel model)
         {
@@ -48,6 +50,7 @@ namespace BuzzTalk.Server.Controllers
             }
             return BadRequest(result.Item2);
         }
+        [AllowAnonymous]
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel login)
         {
@@ -80,7 +83,6 @@ namespace BuzzTalk.Server.Controllers
         }
 
         [HttpGet("GetAllUsers")]
-        [Authorize]
         public async Task<IActionResult> GetAllUsers()
         {
             var id = int.Parse(this.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -91,6 +93,14 @@ namespace BuzzTalk.Server.Controllers
                 return Ok(_mapper.Map<List<UserModelHub>>(data));
             }
             return NotFound("No users found");
+        }
+        [HttpPost("ChangeName")]
+        public async Task<IActionResult> ChangeName(ChangeNameModel nameModel)
+        {
+            var id = int.Parse(this.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var res = await _accountService.ChangeName(id,nameModel.Name);
+            if (res.Item1) return Ok(res.Item2);
+            return BadRequest(res.Item2);
         }
     }
 }

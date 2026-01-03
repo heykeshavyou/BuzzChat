@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import Group from '../../Models/Group';
 import Message from '../../Models/Message';
 import { ApiService } from '../Api/api-service';
-import { find, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import User from '../../Models/User';
 
 @Injectable({
@@ -14,10 +14,10 @@ import User from '../../Models/User';
 })
 export class ChatService {
   private _hubConnection: signalR.HubConnection | null = null;
-  private isLocal = true;
+  private isLocal = false;
   private baseUrl = this.isLocal
     ? 'https://localhost:7059/'
-    : 'http://192.168.1.36/';
+    : 'http://192.168.1.2:45455/';
   Users: UserHub[] = [];
   Groups: Group[] = [];
   CurrentGroup: Group | null = null;
@@ -74,24 +74,7 @@ export class ChatService {
     }
   }
 
-  CreateNewChat(id: number) {
-    let group = this.FindUserGroup(id);
-    if (group == null) {
-      let user = this.Users.find((x) => x.id == id);
-      if (user != undefined) {
-        let group1: Group = {
-          users: [],
-        };
-        group1.users?.push(user);
-        this.CurrentGroup = group1;
-      }
-    } else {
-      this.CurrentGroup = group;
-    }
-    if (window.innerWidth < 1280) {
-      this._router.navigate(['/chat']);
-    }
-  }
+x
   SendMessage(message: Message) {
     this._hubConnection
       ?.invoke('SendMessage', message)

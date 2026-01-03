@@ -119,7 +119,7 @@ namespace BuzzTalk.Server.Hubs
                     await Clients.Client(Receiver.ConnectionId).NewGroupCreated(_mapper.Map<GroupModel>(group));
                 }
             }
-
+            title = await GetNotificationTitle(userId);
             message = _mapper.Map<MessageHub>(res.Item3);
             if (_activeGroups.ContainsKey((int)message.GroupId))
             {
@@ -128,7 +128,6 @@ namespace BuzzTalk.Server.Hubs
             }
             else if(Receiver != null)
             {
-                title = await GetNotificationTitle(userId);
                 await Clients.Client(Receiver.ConnectionId).NewMessageReceive(message);
             }
             var notification = new NotificationDto()

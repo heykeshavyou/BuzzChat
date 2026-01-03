@@ -11,6 +11,7 @@ namespace BuzzTalk.Data.Repositories
         Task<User> Login(string username, string password, string token);
         Task<List<User>> GetAllUsers(int id);
         Task<(bool, string)> SaveToken(string token, int id);
+        Task<(bool,string)> ChangeName(string name, int id);
     }
     public class AccountRepository : IAccountRepository
     {
@@ -81,6 +82,19 @@ namespace BuzzTalk.Data.Repositories
                 return (true, "Token Saved");
             }
             return (false, "Not found");
+
+        }
+
+        public async Task<(bool, string)> ChangeName(string name, int id)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(x=>x.Id== id);
+            if (user != null)
+            {
+                user.Name = name;
+                await _db.SaveChangesAsync();
+                return (true, "Name Changed");
+            }
+            return (false, "User not found");
 
         }
     }

@@ -7,10 +7,11 @@ namespace BuzzTalk.Business.Services
 {
     public interface IAccountService
     {
-         Task<(bool, string,int)> SignIn(UserDto  user);
-        Task<UserDto> Login(string username,string password, string token);
+        Task<(bool, string, int)> SignIn(UserDto user);
+        Task<UserDto> Login(string username, string password, string token);
         Task<List<UserDto>> GetAllUsers(int id);
-        Task<(bool, string)> SaveToken(string token,int id);
+        Task<(bool, string)> ChangeName(int id, string name);
+
     }
     public class AccountService : IAccountService
     {
@@ -20,6 +21,11 @@ namespace BuzzTalk.Business.Services
         {
             _accountRepositry = accountRepositry;
             _mapper = mapper;
+        }
+
+        public async Task<(bool, string)> ChangeName(int id, string name)
+        {
+            return await _accountRepositry.ChangeName(name, id);
         }
 
         public async Task<List<UserDto>> GetAllUsers(int id)
@@ -34,7 +40,7 @@ namespace BuzzTalk.Business.Services
 
         public async Task<UserDto> Login(string username, string password, string token)
         {
-            var user = await _accountRepositry.Login(username, password,token);
+            var user = await _accountRepositry.Login(username, password, token);
             if (user != null)
             {
                 return _mapper.Map<UserDto>(user);
@@ -42,13 +48,8 @@ namespace BuzzTalk.Business.Services
             return null;
         }
 
-        public async Task<(bool, string)> SaveToken(string token, int id)
-        {
-            var res = await _accountRepositry.SaveToken(token, id);
-            return res;
-        }
 
-        public async Task<(bool, string,int)> SignIn(UserDto user)
+        public async Task<(bool, string, int)> SignIn(UserDto user)
         {
             var userModel = _mapper.Map<User>(user);
             return await _accountRepositry.SignIn(userModel);
